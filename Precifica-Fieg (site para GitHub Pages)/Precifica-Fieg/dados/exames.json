@@ -1,0 +1,1719 @@
+{
+ "fonte": "3º Termo Aditivo ao Contrato 101/2023 SESI-GO x Uniscientific Group Laboratório, Goiânia, 25/06/2026",
+ "vigencias": [
+  {
+   "rotulo": "2025/2026",
+   "inicio": "2025-06-26",
+   "fim": "2026-06-25",
+   "campo": "v2025"
+  },
+  {
+   "rotulo": "2026/2027",
+   "inicio": "2026-06-26",
+   "fim": "2027-06-25",
+   "campo": "v2026"
+  }
+ ],
+ "itens": [
+  {
+   "item": 1,
+   "nome": "1,3-Butadieno",
+   "v2025": 176.4,
+   "v2026": 176.4
+  },
+  {
+   "item": 2,
+   "nome": "1,4-Dioxano",
+   "v2025": 258.72,
+   "v2026": 258.72
+  },
+  {
+   "item": 3,
+   "nome": "1-Metil naftaleno e 2-Metil naftaleno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 4,
+   "nome": "1-Metoxi-2-propanol",
+   "v2025": 97.2,
+   "v2026": 115.0
+  },
+  {
+   "item": 5,
+   "nome": "2,4-D",
+   "v2025": 305.76,
+   "v2026": 305.76
+  },
+  {
+   "item": 6,
+   "nome": "2-Butóxi etanol (EGBE)",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 7,
+   "nome": "2-Cianoacrilato de etila",
+   "v2025": 383.67,
+   "v2026": 383.67
+  },
+  {
+   "item": 8,
+   "nome": "2-Etoxietanol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 9,
+   "nome": "2-Metoxietanol",
+   "v2025": 99.96,
+   "v2026": 105.0
+  },
+  {
+   "item": 10,
+   "nome": "2-N-Dibutilaminoetanol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 11,
+   "nome": "2-Propanol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 12,
+   "nome": "4,4-Metileno-bis-(2-cloroanilina) (MOCA)",
+   "v2025": 123.48,
+   "v2026": 130.0
+  },
+  {
+   "item": 13,
+   "nome": "Abamectina",
+   "v2025": 295.18,
+   "v2026": 295.18
+  },
+  {
+   "item": 14,
+   "nome": "Acenafteno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 15,
+   "nome": "Acenaftileno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 16,
+   "nome": "Acetaldeído",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 17,
+   "nome": "Acetato de 1-metóxi-2-propanol",
+   "v2025": 99.2,
+   "v2026": 115.0
+  },
+  {
+   "item": 18,
+   "nome": "Acetato de 2-butoxietila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 19,
+   "nome": "Acetato de 2-etoxietila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 20,
+   "nome": "Acetato de 2-metoxietila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 21,
+   "nome": "Acetato de benzila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 22,
+   "nome": "Acetato de butila, todos os isômeros",
+   "v2025": 88.2,
+   "v2026": 123.0
+  },
+  {
+   "item": 23,
+   "nome": "Acetato de etila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 24,
+   "nome": "Acetato de Isopentila",
+   "v2025": 82.32,
+   "v2026": 123.0
+  },
+  {
+   "item": 25,
+   "nome": "Acetato de metila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 26,
+   "nome": "Acetato de pentila, todos os isômeros",
+   "v2025": 99.96,
+   "v2026": 143.0
+  },
+  {
+   "item": 27,
+   "nome": "Acetato de propila isômeros",
+   "v2025": 97.2,
+   "v2026": 110.0
+  },
+  {
+   "item": 28,
+   "nome": "Acetato de vinila",
+   "v2025": 99.96,
+   "v2026": 115.0
+  },
+  {
+   "item": 29,
+   "nome": "Acetato do Éter Metílico do Monopropileno Glicol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 30,
+   "nome": "Acetofenona",
+   "v2025": 313.99,
+   "v2026": 313.99
+  },
+  {
+   "item": 31,
+   "nome": "Acetona",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 32,
+   "nome": "Acetonitrila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 33,
+   "nome": "Ácido acético",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 34,
+   "nome": "Ácido acrílico",
+   "v2025": 205.8,
+   "v2026": 205.8
+  },
+  {
+   "item": 35,
+   "nome": "Ácido adípico",
+   "v2025": 258.72,
+   "v2026": 258.72
+  },
+  {
+   "item": 36,
+   "nome": "Ácido Crômico",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 37,
+   "nome": "Ácido fórmico",
+   "v2025": 152.88,
+   "v2026": 155.0
+  },
+  {
+   "item": 38,
+   "nome": "Ácido fosfórico",
+   "v2025": 152.88,
+   "v2026": 155.0
+  },
+  {
+   "item": 39,
+   "nome": "Ácido metacrílico",
+   "v2025": 205.8,
+   "v2026": 205.8
+  },
+  {
+   "item": 40,
+   "nome": "Ácido nítrico",
+   "v2025": 137.36,
+   "v2026": 150.0
+  },
+  {
+   "item": 41,
+   "nome": "Ácido peracético",
+   "v2025": 211.68,
+   "v2026": 211.68
+  },
+  {
+   "item": 42,
+   "nome": "Ácido sulfúrico",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 43,
+   "nome": "Acrilato de etila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 44,
+   "nome": "Acrilato de metila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 45,
+   "nome": "Acrilato de n-butila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 46,
+   "nome": "Acrilonitrila",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 47,
+   "nome": "Aguarrás mineral (Solvente de Stoddard)",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 48,
+   "nome": "Álcool benzílico",
+   "v2025": 305.76,
+   "v2026": 305.76
+  },
+  {
+   "item": 49,
+   "nome": "Álcool furfurílico",
+   "v2025": 376.32,
+   "v2026": 376.32
+  },
+  {
+   "item": 50,
+   "nome": "Álcool isoamílico",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 51,
+   "nome": "Álcool isobutílico",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 52,
+   "nome": "Álcool n-butílico",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 53,
+   "nome": "Álcool sec-butílico",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 54,
+   "nome": "Álcool terc-butílico",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 55,
+   "nome": "Algodão, bruto, sem tratamento, poeira",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 56,
+   "nome": "Alumínio metal e compostos insolúveis",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 57,
+   "nome": "Amido",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 58,
+   "nome": "Amônia",
+   "v2025": 111.72,
+   "v2026": 115.0
+  },
+  {
+   "item": 59,
+   "nome": "Anidrido ftálico (FIV)",
+   "v2025": 246.96,
+   "v2026": 246.96
+  },
+  {
+   "item": 60,
+   "nome": "Anilina",
+   "v2025": 141.12,
+   "v2026": 143.0
+  },
+  {
+   "item": 61,
+   "nome": "Antimônio e compostos, como Sb",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 62,
+   "nome": "Antraceno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 63,
+   "nome": "Arsênio e compostos inorgânicos, com As",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 64,
+   "nome": "Asfalto (betume), fumos como aerossol solúvel em benzeno",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 65,
+   "nome": "Azida de sódio, como azida de sódio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 66,
+   "nome": "Bário e compostos solúveis, como Ba",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 67,
+   "nome": "Benzeno",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 68,
+   "nome": "Benzo[a]antraceno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 69,
+   "nome": "Benzo[a]pireno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 70,
+   "nome": "Bisfenol",
+   "v2025": 252.84,
+   "v2026": 252.84
+  },
+  {
+   "item": 71,
+   "nome": "Bissulfito de sódio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 72,
+   "nome": "Borato, compostos inorgânicos",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 73,
+   "nome": "Brometo de etila",
+   "v2025": 235.2,
+   "v2026": 235.2
+  },
+  {
+   "item": 74,
+   "nome": "Brometo de hidrogênio",
+   "v2025": 135.36,
+   "v2026": 150.0
+  },
+  {
+   "item": 75,
+   "nome": "Bromo",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 76,
+   "nome": "Bromofórmio",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 77,
+   "nome": "Butano, isômeros",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 78,
+   "nome": "Cádmio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 79,
+   "nome": "Cádmio e compostos, como Cd",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 80,
+   "nome": "Captan",
+   "v2025": 552.72,
+   "v2026": 552.72
+  },
+  {
+   "item": 81,
+   "nome": "Carbeto de silício, não fibroso (I)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 82,
+   "nome": "Carbeto de silício, não fibroso (R)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 83,
+   "nome": "Carbofuran (FI)",
+   "v2025": 228.73,
+   "v2026": 228.73
+  },
+  {
+   "item": 84,
+   "nome": "Carbofuran (FV)",
+   "v2025": 228.73,
+   "v2026": 228.73
+  },
+  {
+   "item": 85,
+   "nome": "Carvão, poeiras - Antracito",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 86,
+   "nome": "Carvão, poeiras - Betuminoso ou Lignito",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 87,
+   "nome": "Celulose",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 88,
+   "nome": "Chumbo e compostos inorgânicos, como Pb",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 89,
+   "nome": "Cianeto de hidrogênio",
+   "v2025": 82.32,
+   "v2026": 87.0
+  },
+  {
+   "item": 90,
+   "nome": "Ciclohexano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 91,
+   "nome": "Ciclohexanona",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 92,
+   "nome": "Ciclohexeno",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 93,
+   "nome": "Ciclohexilamina",
+   "v2025": 193.62,
+   "v2026": 193.62
+  },
+  {
+   "item": 94,
+   "nome": "Ciclopentano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 95,
+   "nome": "Cimento portland",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 96,
+   "nome": "Cloreto de amônio - fumos",
+   "v2025": 111.72,
+   "v2026": 115.0
+  },
+  {
+   "item": 97,
+   "nome": "Cloreto de hidrogênio",
+   "v2025": 137.36,
+   "v2026": 150.0
+  },
+  {
+   "item": 98,
+   "nome": "Cloreto de vinila",
+   "v2025": 170.52,
+   "v2026": 171.0
+  },
+  {
+   "item": 99,
+   "nome": "Cloreto de zinco, fumos",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 100,
+   "nome": "Cloro",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 101,
+   "nome": "Clorobenzeno",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 102,
+   "nome": "Clorofórmio",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 103,
+   "nome": "Cobalto e compostos inorgânicos, como Co",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 104,
+   "nome": "Cobre, fumos como Cu",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 105,
+   "nome": "Cobre, poeiras e névoas como Cu",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 106,
+   "nome": "Compostos de cromo hexavalente, como Cr(VI), compostos solúveis em água",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 107,
+   "nome": "Compostos de cromo trivalente, como Cr(III), compostos solúveis em água",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 108,
+   "nome": "Criseno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 109,
+   "nome": "Cromato de chumbo, como Pb, determinado como Cr(VI)",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 110,
+   "nome": "Cromo metálico, como Cr(0)",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 111,
+   "nome": "Cumeno",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 112,
+   "nome": "Diacetona álcool",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 113,
+   "nome": "Dibenzo[a,h]antraceno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 114,
+   "nome": "Dibutilftalato",
+   "v2025": 176.4,
+   "v2026": 176.4
+  },
+  {
+   "item": 115,
+   "nome": "Diclorometano",
+   "v2025": 147.0,
+   "v2026": 148.0
+  },
+  {
+   "item": 116,
+   "nome": "Diesel combustível, como hidrocarbonetos totais (FI)",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 117,
+   "nome": "Diesel combustível, como hidrocarbonetos totais (FV)",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 118,
+   "nome": "Dietanolamina (FI)",
+   "v2025": 174.64,
+   "v2026": 195.0
+  },
+  {
+   "item": 119,
+   "nome": "Dietanolamina (FV)",
+   "v2025": 174.64,
+   "v2026": 195.0
+  },
+  {
+   "item": 120,
+   "nome": "Dietilamina",
+   "v2025": 99.96,
+   "v2026": 105.0
+  },
+  {
+   "item": 121,
+   "nome": "Dietileno glicol",
+   "v2025": 170.52,
+   "v2026": 171.0
+  },
+  {
+   "item": 122,
+   "nome": "Dióxido de carbono",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 123,
+   "nome": "Dióxido de cloro",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 124,
+   "nome": "Dióxido de enxofre",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 125,
+   "nome": "Dióxido de nitrogênio",
+   "v2025": 282.24,
+   "v2026": 282.24
+  },
+  {
+   "item": 126,
+   "nome": "Dióxido de titânio (Partículas finas)",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 127,
+   "nome": "Diuron",
+   "v2025": 317.52,
+   "v2026": 317.52
+  },
+  {
+   "item": 128,
+   "nome": "Epicloridrina",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 129,
+   "nome": "Espíritos minerais",
+   "v2025": 204.02,
+   "v2026": 218.0
+  },
+  {
+   "item": 130,
+   "nome": "Estanho e compostos inorgânicos excluindo hidreto de Sn, como Sn",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 131,
+   "nome": "Estanho, compostos orgânicos como estanho",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 132,
+   "nome": "Estearatos (exceto de metais tóxicos) (FI)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 133,
+   "nome": "Estearatos (exceto de metais tóxicos) (R)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 134,
+   "nome": "Estireno, monômero",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 135,
+   "nome": "Etano",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 136,
+   "nome": "Etanol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 137,
+   "nome": "Etanolamina",
+   "v2025": 179.52,
+   "v2026": 195.0
+  },
+  {
+   "item": 138,
+   "nome": "Éter de petróleo (benzina)",
+   "v2025": 134.15,
+   "v2026": 145.0
+  },
+  {
+   "item": 139,
+   "nome": "Éter etílico",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 140,
+   "nome": "Etilbenzeno",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 141,
+   "nome": "Etileno glicol",
+   "v2025": 170.52,
+   "v2026": 171.0
+  },
+  {
+   "item": 142,
+   "nome": "Farinha (poeiras)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 143,
+   "nome": "Fenantreno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 144,
+   "nome": "Fenol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 145,
+   "nome": "Ferro, óxido (Fe2O3)",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 146,
+   "nome": "Ferro, sais solúveis, como Fe",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 147,
+   "nome": "Ferrovanádio, poeira",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 148,
+   "nome": "Fibra de vidro filamento contínuo",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 149,
+   "nome": "Fipronil",
+   "v2025": 465.99,
+   "v2026": 465.99
+  },
+  {
+   "item": 150,
+   "nome": "Fluoranteno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 151,
+   "nome": "Fluoreno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 152,
+   "nome": "Fluoreto de hidrogênio",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 153,
+   "nome": "Fluoretos, como F",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 154,
+   "nome": "Formaldeído",
+   "v2025": 111.72,
+   "v2026": 115.0
+  },
+  {
+   "item": 155,
+   "nome": "Fosfina",
+   "v2025": 524.79,
+   "v2026": 524.79
+  },
+  {
+   "item": 156,
+   "nome": "Gás natural",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 157,
+   "nome": "Gasolina",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 158,
+   "nome": "GLP (gás liquefeito do petróleo)",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 159,
+   "nome": "Glutaraldeído, ativado e não ativado",
+   "v2025": 258.72,
+   "v2026": 258.72
+  },
+  {
+   "item": 160,
+   "nome": "Grafite (todas as formas, exceto fibras de grafite)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 161,
+   "nome": "Grãos, poeira (aveia, trigo, cevada)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 162,
+   "nome": "Heptano, todos os isômeros",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 163,
+   "nome": "Hexametileno diisocianato",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 164,
+   "nome": "Hexano, outros isômeros que não o n-Hexano",
+   "v2025": 88.2,
+   "v2026": 123.0
+  },
+  {
+   "item": 165,
+   "nome": "Hexileno glicol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 166,
+   "nome": "Hidrazina",
+   "v2025": 182.28,
+   "v2026": 182.28
+  },
+  {
+   "item": 167,
+   "nome": "Hidroquinona",
+   "v2025": 135.24,
+   "v2026": 140.0
+  },
+  {
+   "item": 168,
+   "nome": "Hidróxido de cálcio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 169,
+   "nome": "Hidróxido de potássio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 170,
+   "nome": "Hidróxido de sódio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 171,
+   "nome": "Indeno",
+   "v2025": 88.32,
+   "v2026": 94.0
+  },
+  {
+   "item": 172,
+   "nome": "Indeno[1,2,3-cd]pireno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 173,
+   "nome": "Iodetos (FI)",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 174,
+   "nome": "Iodo (FI)",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 175,
+   "nome": "Iodo (FV)",
+   "v2025": 88.62,
+   "v2026": 94.0
+  },
+  {
+   "item": 176,
+   "nome": "Isoforona",
+   "v2025": 204.02,
+   "v2026": 204.02
+  },
+  {
+   "item": 177,
+   "nome": "Isoparafina (C8-C14)",
+   "v2025": 76.44,
+   "v2026": 200.0
+  },
+  {
+   "item": 178,
+   "nome": "Lantânio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 179,
+   "nome": "Lítio",
+   "v2025": 47.04,
+   "v2026": 74.0
+  },
+  {
+   "item": 180,
+   "nome": "Madeira - Poeiras, Cedro vermelho do Oeste",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 181,
+   "nome": "Madeira - Poeiras, Todas as outras espécies",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 182,
+   "nome": "Manganês e seus compostos",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 183,
+   "nome": "Manganês, compostos inorgânicos, como Mn",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 184,
+   "nome": "Manganês, elementar",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 185,
+   "nome": "Mercúrio, Hg elementar e formas inorgânicas",
+   "v2025": 182.28,
+   "v2026": 182.28
+  },
+  {
+   "item": 186,
+   "nome": "Mesetileno",
+   "v2025": 88.2,
+   "v2026": 123.0
+  },
+  {
+   "item": 187,
+   "nome": "Metabissulfito de sódio",
+   "v2025": 75.6,
+   "v2026": 75.6
+  },
+  {
+   "item": 188,
+   "nome": "Metacrilato de metila",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 189,
+   "nome": "Metais duros, contendo carboneto de tungstênio e cobalto, como Co",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 190,
+   "nome": "Metais FI (Mg, Mn, Mo, Ni, Cr, Sn, Co)",
+   "v2025": 158.32,
+   "v2026": 172.0
+  },
+  {
+   "item": 191,
+   "nome": "Metais FR (Al, Cd, Fe, Mn, Mo, TiO2, Zn)",
+   "v2025": 158.32,
+   "v2026": 172.0
+  },
+  {
+   "item": 192,
+   "nome": "Metais FT (Sb, B, Cd, Ca, Pb, Cu, Mn, Sn)",
+   "v2025": 181.55,
+   "v2026": 197.0
+  },
+  {
+   "item": 193,
+   "nome": "Metalworking fluids",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 194,
+   "nome": "Metano",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 195,
+   "nome": "Metanol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 196,
+   "nome": "Metil etil cetona",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 197,
+   "nome": "Metil isobutil carbinol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 198,
+   "nome": "Metil isobutil cetona",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 199,
+   "nome": "Metileno bisfenil isocianato",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 200,
+   "nome": "Metomil",
+   "v2025": 598.61,
+   "v2026": 598.61
+  },
+  {
+   "item": 201,
+   "nome": "Mica",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 202,
+   "nome": "Molibdênio, como Mo, compostos solúveis",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 203,
+   "nome": "Molibdênio, como Mo, metal e compostos insolúveis (I)",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 204,
+   "nome": "Molibdênio, como Mo, metal e compostos insolúveis (R)",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 205,
+   "nome": "Monóxido de carbono",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 206,
+   "nome": "Morfolina",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 207,
+   "nome": "n-Decano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 208,
+   "nome": "n-Dodecano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 209,
+   "nome": "n-Hexadecano",
+   "v2025": 86.32,
+   "v2026": 94.0
+  },
+  {
+   "item": 210,
+   "nome": "n-Hexano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 211,
+   "nome": "n-Metilpirrolidona",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 212,
+   "nome": "n-Pentadecano",
+   "v2025": 86.32,
+   "v2026": 94.0
+  },
+  {
+   "item": 213,
+   "nome": "n-Propanol",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 214,
+   "nome": "n-Tetradecano",
+   "v2025": 86.32,
+   "v2026": 94.0
+  },
+  {
+   "item": 215,
+   "nome": "n-Tridecano",
+   "v2025": 86.32,
+   "v2026": 94.0
+  },
+  {
+   "item": 216,
+   "nome": "n-Undecano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 217,
+   "nome": "Nafta de petróleo",
+   "v2025": 154.27,
+   "v2026": 165.0
+  },
+  {
+   "item": 218,
+   "nome": "Nafta PCR",
+   "v2025": 411.6,
+   "v2026": 411.6
+  },
+  {
+   "item": 219,
+   "nome": "Naftaleno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 220,
+   "nome": "Naftas Leves",
+   "v2025": 177.4,
+   "v2026": 190.0
+  },
+  {
+   "item": 221,
+   "nome": "Naftas Pesadas",
+   "v2025": 329.28,
+   "v2026": 380.0
+  },
+  {
+   "item": 222,
+   "nome": "Negro de fumo",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 223,
+   "nome": "Níquel e compostos inorgânicos incluindo subsulfeto de níquel, como Ni elementar",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 224,
+   "nome": "Níquel e compostos inorgânicos insolúveis, (NOS)",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 225,
+   "nome": "Nonano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 226,
+   "nome": "o-Toluidina",
+   "v2025": 141.12,
+   "v2026": 143.0
+  },
+  {
+   "item": 227,
+   "nome": "Octano, todos os isômeros",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 228,
+   "nome": "Óleo mineral, excluídos os fluidos de trabalho com metais",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 229,
+   "nome": "Óxido de boro",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 230,
+   "nome": "Óxido de cálcio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 231,
+   "nome": "Óxido de etileno",
+   "v2025": 141.12,
+   "v2026": 143.0
+  },
+  {
+   "item": 232,
+   "nome": "Óxido de magnésio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 233,
+   "nome": "Óxido de Mesitila",
+   "v2025": 205.8,
+   "v2026": 205.8
+  },
+  {
+   "item": 234,
+   "nome": "Óxido de propileno",
+   "v2025": 99.96,
+   "v2026": 105.0
+  },
+  {
+   "item": 235,
+   "nome": "Óxido de zinco",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 236,
+   "nome": "Óxido nítrico",
+   "v2025": 282.24,
+   "v2026": 282.24
+  },
+  {
+   "item": 237,
+   "nome": "Ozônio",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 238,
+   "nome": "Parafina, cera (fumos)",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 239,
+   "nome": "Particulado Inalável (PNOS)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 240,
+   "nome": "Particulado Respirável (PNOS)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 241,
+   "nome": "Pentano, todos os isômeros",
+   "v2025": 88.2,
+   "v2026": 125.0
+  },
+  {
+   "item": 242,
+   "nome": "Peróxido de hidrogênio",
+   "v2025": 141.12,
+   "v2026": 143.0
+  },
+  {
+   "item": 243,
+   "nome": "Picloram",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 244,
+   "nome": "Pireno",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 245,
+   "nome": "Piridina",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 246,
+   "nome": "Pirimifos metil",
+   "v2025": 458.64,
+   "v2026": 458.64
+  },
+  {
+   "item": 247,
+   "nome": "Poeira Respirável",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 248,
+   "nome": "Poeira Respirável + Sílica Livre Cristalina",
+   "v2025": 142.3,
+   "v2026": 142.3
+  },
+  {
+   "item": 249,
+   "nome": "Poeira Total",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 250,
+   "nome": "Poeira Total + Sílica Livre Cristalina",
+   "v2025": 142.3,
+   "v2026": 142.3
+  },
+  {
+   "item": 251,
+   "nome": "Prata como metal, poeira e fumos",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 252,
+   "nome": "Propano",
+   "v2025": 129.36,
+   "v2026": 135.0
+  },
+  {
+   "item": 253,
+   "nome": "Querosene combustível de avião",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 254,
+   "nome": "Querosene, como vapor de hidrocarbonetos totais",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 255,
+   "nome": "Sacarose",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 256,
+   "nome": "Sais de cianeto",
+   "v2025": 82.32,
+   "v2026": 87.0
+  },
+  {
+   "item": 257,
+   "nome": "Selênio e compostos, como Se",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 258,
+   "nome": "Silicato de cálcio ocorrência natural como Wollastonite",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 259,
+   "nome": "Silício",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 260,
+   "nome": "Solvente de borracha",
+   "v2025": 204.02,
+   "v2026": 218.0
+  },
+  {
+   "item": 261,
+   "nome": "Subsulfeto de níquel, como Ni",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 262,
+   "nome": "Sulfato de bário",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 263,
+   "nome": "Sulfato de cálcio",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 264,
+   "nome": "Sulfeto de hidrogênio",
+   "v2025": 147.0,
+   "v2026": 148.0
+  },
+  {
+   "item": 265,
+   "nome": "Talco (sem fibra de asbesto)",
+   "v2025": 47.04,
+   "v2026": 50.0
+  },
+  {
+   "item": 266,
+   "nome": "Terebentina e monoterpenos selecionados",
+   "v2025": 182.28,
+   "v2026": 182.28
+  },
+  {
+   "item": 267,
+   "nome": "Tetrahidrofurano",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 268,
+   "nome": "Tolueno",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 269,
+   "nome": "Tolueno 2,4 ou 2,6 - diisocianato (ou como mistura)",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 270,
+   "nome": "Tricloroetileno",
+   "v2025": 88.2,
+   "v2026": 94.0
+  },
+  {
+   "item": 271,
+   "nome": "Trietanolamina",
+   "v2025": 186.52,
+   "v2026": 195.0
+  },
+  {
+   "item": 272,
+   "nome": "Trietilamina",
+   "v2025": 194.04,
+   "v2026": 194.04
+  },
+  {
+   "item": 273,
+   "nome": "Trimetil benzeno (mistura de isômeros)",
+   "v2025": 99.96,
+   "v2026": 143.0
+  },
+  {
+   "item": 274,
+   "nome": "Trimetilamina",
+   "v2025": 193.62,
+   "v2026": 193.62
+  },
+  {
+   "item": 275,
+   "nome": "Trióxido de Antimônio",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 276,
+   "nome": "Tungstênio e compostos, na ausência de cobalto, como W",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": 277,
+   "nome": "Varredura de HPA (17 agentes)",
+   "v2025": 529.2,
+   "v2026": 529.2
+  },
+  {
+   "item": 278,
+   "nome": "Varredura de Metais (20 agentes)",
+   "v2025": 364.56,
+   "v2026": 364.56
+  },
+  {
+   "item": 279,
+   "nome": "Varredura de Naftas (C5-C15)",
+   "v2025": 364.56,
+   "v2026": 364.56
+  },
+  {
+   "item": 280,
+   "nome": "Varredura de Vapores Orgânicos (35 agentes)",
+   "v2025": 329.28,
+   "v2026": 329.28
+  },
+  {
+   "item": 281,
+   "nome": "Xileno, todos os isômeros",
+   "v2025": 88.2,
+   "v2026": 123.0
+  },
+  {
+   "item": 282,
+   "nome": "Zircônio e compostos, como Zr",
+   "v2025": 76.44,
+   "v2026": 76.44
+  },
+  {
+   "item": "M1",
+   "nome": "Glifosato",
+   "v2025": 152.0,
+   "v2026": 152.0,
+   "manual": true,
+   "fonte": "Incluído manualmente (planilha Anicuns 24/09/2026). Não consta no aditivo Uniscientific: confirmar preço com o laboratório."
+  }
+ ]
+}

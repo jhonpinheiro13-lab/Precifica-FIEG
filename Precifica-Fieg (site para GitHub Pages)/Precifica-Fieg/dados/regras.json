@@ -1,0 +1,424 @@
+{
+ "versao": "2026-09-26g",
+ "observacao": "Todos os valores podem ser editados. Os marcados como pendente ainda não foram confirmados pela Central de SST.",
+ "valores": {
+  "diaria_completa": {
+   "valor": 250,
+   "rotulo": "Diária completa (R$/dia)",
+   "obs": "Com pernoite"
+  },
+  "meia_diaria": {
+   "valor": 90,
+   "rotulo": "Meia diária (R$/dia)",
+   "obs": "Acima de 150 km (ida) voltando no mesmo dia"
+  },
+  "refeicao": {
+   "valor": 55,
+   "rotulo": "Refeição / ajuda de custo (R$/dia)",
+   "obs": "Até 150 km (ida)"
+  },
+  "km": {
+   "valor": 2.0,
+   "rotulo": "Km rodado (R$/km)"
+  },
+  "km_livre_ida_volta": {
+   "valor": 50,
+   "rotulo": "Ida e volta sem cobrança de deslocamento (até km)"
+  },
+  "dist_diaria_ida": {
+   "valor": 150,
+   "rotulo": "Distância (ida) a partir da qual paga diária (km)"
+  },
+  "hora_engenheiro": {
+   "valor": 61.19,
+   "rotulo": "Hora Engenheiro (R$/h)"
+  },
+  "hora_tst": {
+   "valor": 24.5,
+   "rotulo": "Hora Técnico de Segurança (R$/h)"
+  },
+  "levantamento_h_eng": {
+   "valor": 0,
+   "rotulo": "Levantamento de dados: horas Engenheiro",
+   "pendente": true,
+   "obs": "Sempre 0 nas planilhas de referência"
+  },
+  "art": {
+   "valor": 250,
+   "rotulo": "ART - CREA (R$)"
+  },
+  "postagem": {
+   "valor": 70,
+   "rotulo": "Postagem de amostra (R$/envio)"
+  },
+  "postagens_com_quimico": {
+   "valor": 2,
+   "rotulo": "Postagens mínimas quando há químico",
+   "obs": "Depois do mínimo, uma postagem por viagem/semana de campo"
+  },
+  "folha": {
+   "valor": 0.65,
+   "rotulo": "Folha de papel + impressão (R$/folha)"
+  },
+  "folhas_por_avaliacao": {
+   "valor": 10,
+   "rotulo": "Folhas por avaliação",
+   "obs": "Com teto (parâmetro abaixo)"
+  },
+  "lancamento_h_min": {
+   "valor": 5,
+   "rotulo": "Lançamento de dados: horas mínimas"
+  },
+  "revisao_h_eng": {
+   "valor": 5,
+   "rotulo": "Revisão de relatório: horas mínimas do Engenheiro"
+  },
+  "entrega_h_eng": {
+   "valor": 0,
+   "rotulo": "Entrega de relatório: horas Engenheiro"
+  },
+  "dosimetria_pct": {
+   "valor": 0.2,
+   "rotulo": "Ruído: % dos colaboradores do GES (arredonda para cima, mínimo 1)",
+   "formato": "pct"
+  },
+  "dosimetria_limiar": {
+   "valor": 0,
+   "rotulo": "Ruído: aplicar a % a partir de N colaboradores (0 = sempre; até N, 1 medição)",
+   "obs": "Até 9 expostos: 1 dosimetria por GES"
+  },
+  "qualitativa_varias": {
+   "valor": 150,
+   "rotulo": "Avaliação qualitativa (R$) quando há mais de uma"
+  },
+  "qualitativa_unica": {
+   "valor": 300,
+   "rotulo": "Avaliação qualitativa (R$) quando é a única"
+  },
+  "ausencia_valor": {
+   "valor": 1500,
+   "rotulo": "Laudo de ausência de risco (valor fechado, R$)",
+   "obs": "LTCAT e LI sem nenhuma avaliação"
+  },
+  "lp_por_cargo": {
+   "valor": 1500,
+   "rotulo": "Laudo de Periculosidade: valor por função (R$)"
+  },
+  "lp_muitos_valor": {
+   "valor": 800,
+   "rotulo": "LP: valor por função quando são 10 ou mais (R$)"
+  },
+  "lp_muitos_limiar": {
+   "valor": 10,
+   "rotulo": "LP: a partir de quantas funções vale o valor reduzido",
+   "obs": "10 ou mais funções: R$ 800 cada"
+  },
+  "bdi": {
+   "valor": 0.3,
+   "rotulo": "BDI (%)",
+   "formato": "pct",
+   "obs": "30% em todas as planilhas de referência; sem regra escrita"
+  },
+  "desconto": {
+   "valor": 0,
+   "rotulo": "Desconto exclusivo (%)",
+   "formato": "pct"
+  },
+  "nr22_medicoes_poeira": {
+   "valor": 3,
+   "rotulo": "Mineração (NR-22 Anexo V): medições de poeira mineral por GES",
+   "obs": "Item 4.2: 3 a 5 medições (média aritmética) ou 6 ou mais. Aplicado quando a empresa é marcada como mineração"
+  },
+  "horas_dia_campo": {
+   "valor": 10,
+   "rotulo": "Horas técnicas por dia de campo (TST)",
+   "obs": "Anotação da Central: 10 h por dia de dosimetria (6 dosimetrias/dia). Horas de campo = dias x este valor"
+  },
+  "quimicos_em_paralelo": {
+   "valor": 1,
+   "rotulo": "Químicos em paralelo com a dosimetria (1 = sim, 0 = não)",
+   "obs": "Bombas instaladas no mesmo dia/trabalhador da dosimetria: só contam os dias de químico que excedem os de dosimetria"
+  },
+  "lancamento_pct": {
+   "valor": 0.5,
+   "rotulo": "Lançamento de dados: % das horas de campo",
+   "formato": "pct",
+   "obs": "Planilhas de referência (Goyaço, Dryfast, Anicuns): 50%"
+  },
+  "revisao_pct": {
+   "valor": 0.25,
+   "rotulo": "Revisão de relatório (Engenheiro): % das horas de campo",
+   "formato": "pct",
+   "obs": "Planilhas de referência: 25% com mínimo de 5 h"
+  },
+  "dias_por_viagem": {
+   "valor": 5,
+   "rotulo": "Dias de campo por viagem (com pernoite)",
+   "obs": "Uma ida e volta por semana útil. Define meias diárias, km e postagens"
+  },
+  "folhas_teto": {
+   "valor": 600,
+   "rotulo": "Folhas: teto por orçamento",
+   "obs": "Folhas = avaliações x folhas por avaliação, limitado a este teto"
+  },
+  "ruido_base_ges": {
+   "valor": 1,
+   "rotulo": "Ruído calculado por GES (1 = sim; soma os cargos do mesmo GHE)",
+   "formato": "num",
+   "fonte": "Decisão da gestão, 25/09/2026"
+  }
+ },
+ "tipos": {
+  "Ruído (dosimetria)": {
+   "horas": 0,
+   "por_dia": 6,
+   "fixo": 0,
+   "regra": "20% dos expostos acima de 9, senão 1. 6 por dia de campo. Custo nas horas técnicas."
+  },
+  "Calor (IBUTG)": {
+   "horas": 0,
+   "por_dia": 2,
+   "fixo": 0,
+   "regra": "1 por GES/cargo. 2 por dia de campo. Custo nas horas técnicas (sem valor unitário)."
+  },
+  "Vibração corpo inteiro": {
+   "horas": 0,
+   "por_dia": 6,
+   "fixo": 300,
+   "regra": "1 por GES. Preço fixo + horas técnicas."
+  },
+  "Vibração mãos e braços": {
+   "horas": 0,
+   "por_dia": 6,
+   "fixo": 300,
+   "regra": "1 por GES. Preço fixo + horas técnicas."
+  },
+  "Químico (laboratório)": {
+   "horas": 0,
+   "por_dia": 5,
+   "fixo": 0,
+   "regra": "1 amostrador por GES. Preço da Tabela de Exames vigente."
+  },
+  "Avaliação qualitativa": {
+   "horas": 0,
+   "por_dia": 10,
+   "fixo": 0,
+   "regra": "R$ 150 cada; R$ 300 quando é a única do orçamento."
+  },
+  "Ausência de risco": {
+   "horas": 0,
+   "por_dia": 0,
+   "fixo": 0,
+   "regra": "Não gera avaliação. Laudo só de ausência vale o valor fechado."
+  },
+  "Periculosidade (por cargo)": {
+   "horas": 0,
+   "por_dia": 0,
+   "fixo": 0,
+   "regra": "R$ 1.500 por cargo na região; R$ 800 quando são muitos cargos."
+  }
+ },
+ "planos": {
+  "Sem plano / avulso": {
+   "cobre": [],
+   "laudos": [],
+   "descricao": "Sem plano: orça tudo o que o PGR aponta"
+  },
+  "SST Base": {
+   "cobre": [],
+   "laudos": [],
+   "descricao": "Sem direito a nenhuma medição. Todos os serviços são à parte"
+  },
+  "SST Plus": {
+   "cobre": [
+    "Ruído (dosimetria)",
+    "Calor (IBUTG)",
+    "Vibração corpo inteiro",
+    "Vibração mãos e braços",
+    "fisico_qualitativo"
+   ],
+   "laudos": [
+    "LTCAT"
+   ],
+   "descricao": "LTCAT com todos os físicos (ruído, calor, vibração, radiação, frio, umidade). Químico, biológico e LP são à parte"
+  },
+  "SST Premium": {
+   "cobre": [
+    "Ruído (dosimetria)",
+    "Calor (IBUTG)",
+    "Vibração corpo inteiro",
+    "Vibração mãos e braços",
+    "fisico_qualitativo"
+   ],
+   "laudos": [
+    "LTCAT",
+    "LI"
+   ],
+   "descricao": "LTCAT e LI com todos os físicos. Químico, biológico e LP são à parte"
+  }
+ },
+ "pendentes_resumo": [
+  "Jornada técnica por dia de campo: 10 h (anotação) ou 8 h (usada na Anicuns)",
+  "Calor: só horas (anotação) ou também R$ 150 por medição (usado na Anicuns)",
+  "Ruído: 20% por GES/cargo acima de 9 ou 20% do efetivo total da empresa",
+  "Dias por viagem com pernoite (5 adotado; Anicuns usou 7,5)",
+  "Varredura x agente próprio: critério",
+  "AET, PPR e FIT test: entram na versão 2"
+ ],
+ "observacao_laudos": "LTCAT e LI não são cobrados como documento: cobra-se os serviços que os compõem. O LTCAT/LI é consequência das medições contratadas fora do plano.",
+ "decisoes": [
+  {
+   "data": "2026-09-25",
+   "tema": "Base do ruído",
+   "decisao": "Por GES. No PGR por cargo, os cargos do mesmo GHE são somados e as dosimetrias distribuídas entre eles."
+  },
+  {
+   "data": "2026-09-25",
+   "tema": "Químico sem identificação e adubo",
+   "decisao": "Não viram qualitativa automática. Ficam pendentes como OUTROS, com ponto crítico para validação."
+  },
+  {
+   "data": "2026-09-25",
+   "tema": "Regra do ruído no esboço",
+   "decisao": "Dosimetrias = teto(20% x colaboradores do GES), mínimo 1, sem limiar (ex.: 7 x 20% = 1,4 = 2). Parâmetro ajustável."
+  }
+ ],
+ "ppr": {
+  "fonte": "Tabela de precificação PPR (planilha TRIGOBEL, SESI-GO 2024)",
+  "faixas": [
+   {
+    "ate": 20,
+    "rotulo": "1 a 20 trabalhadores",
+    "valor": 2000
+   },
+   {
+    "ate": 50,
+    "rotulo": "21 a 50 trabalhadores",
+    "valor": 2600
+   },
+   {
+    "ate": 100,
+    "rotulo": "51 a 100 trabalhadores",
+    "valor": 3300
+   },
+   {
+    "ate": 250,
+    "rotulo": "101 a 250 trabalhadores",
+    "valor": 4500
+   },
+   {
+    "ate": 400,
+    "rotulo": "251 a 400 trabalhadores",
+    "valor": 5500
+   }
+  ],
+  "hora_treinamento": 120,
+  "treinamentos": [
+   {
+    "nome": "Administrador do PPR",
+    "horas": 8
+   },
+   {
+    "nome": "SESMT",
+    "horas": 1
+   },
+   {
+    "nome": "Supervisor",
+    "horas": 1
+   },
+   {
+    "nome": "Distribuidor de EPR",
+    "horas": 1
+   },
+   {
+    "nome": "Usuário",
+    "horas": 2
+   },
+   {
+    "nome": "Emergência",
+    "horas": 1
+   },
+   {
+    "nome": "Terceiros",
+    "horas": 2
+   },
+   {
+    "nome": "Todos os treinamentos citados no PPR",
+    "horas": 16,
+    "todos": true
+   }
+  ],
+  "fit_test": 50,
+  "km": 1.5,
+  "diaria": 250,
+  "art": 250,
+  "material": 350,
+  "bdi": 0.3,
+  "bdi_amostra": 0.15
+ },
+ "ergonomia": {
+  "fonte": "Tabela de preços corporativa 2025 v7 atualizada (SESI-DR/GO 2026): abas AEP, AET e FRPRT",
+  "diaria": 250,
+  "meia_diaria": 90,
+  "folha": 0.65,
+  "veiculo": 30,
+  "km": 1.5,
+  "alimentacao": 55,
+  "bdi": 0.3,
+  "aep": {
+   "hora": 35.79,
+   "campo_min": 20,
+   "lanc_min": 100
+  },
+  "aet": {
+   "hora": 35.79,
+   "adm": {
+    "campo_min": 20,
+    "lanc_min": 220
+   },
+   "prod": {
+    "campo_min": 30,
+    "lanc_min": 330
+   }
+  },
+  "frp": {
+   "hora": 40,
+   "tabulacao_min": 480,
+   "relatorio_min": 480,
+   "aplicacao_min": 480,
+   "limite_consulta": 500,
+   "faixas": [
+    {
+     "ate": 20,
+     "rotulo": "Até 20",
+     "dias": 1
+    },
+    {
+     "ate": 30,
+     "rotulo": "De 21 a 30",
+     "dias": 2
+    },
+    {
+     "ate": 100,
+     "rotulo": "De 31 a 100",
+     "dias": 3
+    },
+    {
+     "ate": 300,
+     "rotulo": "De 101 a 300",
+     "dias": 4
+    },
+    {
+     "ate": 500,
+     "rotulo": "De 301 a 500",
+     "dias": 5
+    },
+    {
+     "ate": null,
+     "rotulo": "Acima de 500",
+     "dias": 6
+    }
+   ]
+  }
+ }
+}
