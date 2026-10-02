@@ -58,6 +58,9 @@
   .lote-status { font-size:13px; color:#2B3A4F; font-weight:600; }
   @media (max-width:900px) { .grid-f { grid-template-columns:1fr 1fr; } }
   .entrada3 { align-items:stretch; } .entrada3 .card { display:flex; flex-direction:column; } .entrada3 .zona { flex:1; }
+  .lp-resumo { line-height:1.6; }
+  .lp-alertas { margin-top:6px; color:#9B2323; font-weight:600; font-size:12.5px; line-height:1.45; } .lp-alertas div { margin-top:3px; }
+  tr.rf-per td { background:#FFF4EA; }
   .tag-btn { cursor:pointer; font-family:inherit; border:1px solid #F3C49A; text-decoration:underline dotted; text-underline-offset:3px; }
   .tag-btn:hover { border-color:#F08B3E; }
   .tag-btn.ativo { border-color:#C25E10; box-shadow:0 0 0 2px #FBD3B0; font-weight:700; }
@@ -290,7 +293,7 @@
       <div class="botoes" style="margin-top:0;margin-bottom:8px"><label style="margin:0">Unidade de contagem</label>
         <select id="sel-unidade" style="width:auto"><option value="ges">Por GES / GHE</option><option value="cargo">Por cargo (PGR planilha por cargo)</option></select>
         <small id="unidade-info"></small></div>
-      <div class="botoes" style="margin:0 0 6px"><input id="lev-filtro" placeholder="Filtrar: GES, nome, agente, observação..." style="width:300px"><select id="lev-filtro-tipo" style="width:auto"></select><button class="sec" id="lev-filtro-limpar">Limpar filtro</button></div>
+      <div class="botoes" style="margin:0 0 6px"><input id="lev-filtro" placeholder="Filtrar: GES, função, nome, agente, observação..." style="width:300px"><select id="lev-filtro-tipo" style="width:auto"></select><button class="sec" id="lev-filtro-limpar">Limpar filtro</button></div>
       <div id="lev-grupos" style="margin-bottom:6px"></div>
       <div id="lev-info" style="margin-bottom:8px"></div>
       <div style="overflow:auto">
@@ -303,6 +306,7 @@
       <datalist id="lista-cidades"></datalist>
       <div class="botoes">
         <button class="sec" id="btn-add-linha">+ Linha</button>
+        <button class="sec" id="btn-riscos">Riscos do PGR (filtrar por risco, função, GES)</button>
         <button class="sec" id="btn-lp">Laudo de Periculosidade: escolher funções</button>
         <button class="sec" id="btn-crit">Pontos críticos</button>
         <button class="sec" id="btn-ordenar">Ordenar por GES</button>
@@ -323,6 +327,9 @@
     <h2>3. Escopo</h2>
     <div class="grid2">
       <div class="card">
+        <div class="campo" style="margin-bottom:12px"><label>Tipo de laudo (vai na planilha e na proposta)</label>
+          <div class="tipos-laudo" id="log-tipo"><label><input type="checkbox" value="LTCAT"> LTCAT</label><label><input type="checkbox" value="LI"> LI</label><label><input type="checkbox" value="LP"> LP</label></div>
+          <div id="lp-aviso" class="lp-aviso" hidden></div></div>
         <div class="campo"><label>Plano do cliente</label><select id="sel-plano"></select></div>
         <div id="plano-desc" style="margin-bottom:10px"></div>
         <div class="botoes">
@@ -354,9 +361,6 @@
         <div class="campo"><label>Logística</label><select id="log-modo"><option value="auto">Automática (a mais barata)</option><option value="diario">Ida e volta todo dia</option><option value="pernoite">Pernoite (diárias + viagens semanais)</option></select></div>
         <div class="campo"><label>Dias em campo (deixe vazio para calcular)</label><input id="log-dias" type="number" min="1"></div>
         <div class="campo"><label>Responsável pela precificação</label><input id="log-resp"></div>
-        <div class="campo"><label>Tipo de laudo (vai na planilha e na proposta)</label>
-          <div class="tipos-laudo" id="log-tipo"><label><input type="checkbox" value="LTCAT"> LTCAT</label><label><input type="checkbox" value="LI"> LI</label><label><input type="checkbox" value="LP"> LP</label></div>
-          <div id="lp-aviso" class="lp-aviso" hidden></div></div>
         <div class="campo"><label>Data</label><input id="log-data" type="date"></div>
         <div class="campo"><label>Vigência da tabela de exames</label><select id="log-vig"></select></div>
       </div>
@@ -600,6 +604,7 @@
   <div class="botoes" style="margin-top:0">
     <button class="pri" id="btn-lp-aplicar">Aplicar seleção</button>
     <button class="sec" id="btn-lp-oper">Marcar GES com risco</button>
+    <button class="sec" id="btn-lp-peric">Marcar só possível periculosidade</button>
     <button class="sec" id="btn-lp-todas">Marcar todas</button>
     <button class="sec" id="btn-lp-nenhuma">Limpar</button>
     <button class="sec" id="btn-lp-fechar">Fechar</button>
@@ -623,6 +628,7 @@
   <p><small>Revise os pareceres das ocorrências pendentes (por que não adotamos) e informe o motivo das alterações manuais. O texto padrão pode ser editado. Tudo vai junto no JSON e na pasta do cliente.</small></p>
   <div id="ocorr-lista"></div>
 </aside>
+<aside class="painel" id="painel-riscos" style="width:980px"><div class="botoes" style="margin-top:0"><button class="pri" id="btn-riscos-fechar">Fechar</button></div><h3>Riscos do PGR: todos os grupos</h3><div id="riscos-lista"></div></aside>
 <aside class="painel" id="painel-reg" style="width:600px"><div id="reg-form"></div></aside>
 <aside class="painel" id="painel-param">
   <div class="botoes" style="margin-top:0">
@@ -1758,13 +1764,17 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     for (const [t, rot] of fixos) {
       const ls = A.filter(l => l.tipo === t); const q = ls.reduce((s, l) => s + l.qtd, 0);
       const custo = r2(ls.reduce((s, l) => s + l.custo, 0));
-      let detalhe = '';
-      if (t === T.QUAL && q) {
-        // quais avaliações qualitativas: agente e quantidade (ex.: Radiação ultravioleta 4; Biológico 1)
-        const ag = {};
-        for (const l of ls) { const k = String(l.agente || l.fatorOriginal || 'não especificado').replace(/^Biológico:\s*/i, 'Biológico: ').trim(); ag[k] = (ag[k] || 0) + l.qtd; }
-        detalhe = Object.entries(ag).map(([k, n]) => `${k} (${n})`).join('; ');
+      // qualitativas e LP: uma linha por agente / função (para ver separado no resumo e na planilha)
+      if ((t === T.QUAL || t === T.LP) && q) {
+        const grp = {};
+        for (const l of ls) {
+          const k = t === T.QUAL ? String(l.agente || l.fatorOriginal || 'não especificado').replace(/^Biológico:\s*/i, 'Biológico: ').trim() : `${l.agente || 'função'}${l.ges !== '' && l.ges != null ? ' (GES ' + l.ges + ')' : ''}`;
+          grp[k] = grp[k] || { q: 0, c: 0 }; grp[k].q += l.qtd; grp[k].c += l.custo;
+        }
+        for (const [k, g] of Object.entries(grp)) secao4.push({ descricao: (t === T.QUAL ? 'Avaliação qualitativa: ' : 'Laudo de Periculosidade: ') + k, tipo: t, qtd: g.q, valorUnit: g.q ? r2(g.c / g.q) : 0, total: r2(g.c), detalhe: '' });
+        continue;
       }
+      const detalhe = '';
       secao4.push({ descricao: rot, tipo: t, qtd: q, valorUnit: q ? r2(custo / q) : (tipo(R, t).fixo || 0), total: custo, detalhe });
     }
     const quim = {};
@@ -3650,13 +3660,14 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     $('#unidade-info').textContent = S.pgr && S.pgr.porCargo ? (S.unidade === 'cargo' ? 'Uma linha por cargo do PGR (como na precificação manual da Central). Ruído calculado por GES: soma os expostos dos cargos do mesmo GHE, aplica a regra do ruído e distribui entre os cargos.' : 'Cargos agrupados pelo GHE do anexo do PGR.') : 'Este PGR já vem por GES.';
     Motor.sugeridas(S.linhas, S.regras, { mineracao: S.mineracao }, S.gruposExcluidos); renderRegraRuido(); renderFiltrosLev();
     const F = S.filtroLev || { texto: '', tipo: '' }; const fq = Classificar.norm(F.texto || '');
+    const funcoesGes = {}; if (S.pgr) for (const g of S.pgr.ges) funcoesGes[String(g.codigo)] = (g.cargos || []).join(' ');
     const idxCrit = F.tipo === 'CRITICOS' ? new Set(pontosCriticos().flatMap(c => c.linhas || [])) : null;
     const passaFiltro = (l, i) => {
       if (F.tipo === 'VERIFICAR' && !l.verificar) return false;
       if (F.tipo === 'CRITICOS') { if (!idxCrit.has(i)) return false; }
       if (F.tipo && F.tipo.startsWith('grupo:') && Motor.grupoLinha(l) !== F.tipo.slice(6)) return false;
       if (F.tipo && F.tipo !== 'VERIFICAR' && F.tipo !== 'CRITICOS' && !F.tipo.startsWith('grupo:') && l.tipo !== F.tipo) return false;
-      if (fq && !Classificar.norm([l.ges, l.nome, l.tipo, l.agente, l.fatorOriginal, l.obs].join(' ')).includes(fq)) return false;
+      if (fq && !Classificar.norm([l.ges, l.nome, l.tipo, l.agente, l.fatorOriginal, l.obs, funcoesGes[String(l.ges)] || ''].join(' ')).includes(fq)) return false;
       return true;
     };
     let nVis = 0;
@@ -3706,6 +3717,8 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const nOut = S.linhas.filter(l => l.outros && !l.agente && (l.valorManual === null || l.valorManual === undefined) && l.escopo !== 'nao').length;
     if (nOut) $('#lev-info').innerHTML += `<div class="alerta-forte">${nOut} linha(s) "OUTROS" ou químico sem identificação, sem exame nem valor. ${S.modulo === 'esboco' ? 'Elas precisam de definição antes do esboço final.' : 'Elas não entram no preço até você definir.'} <button class="mini2" id="btn-lev-crit">Resolver agora</button></div>`;
     const bl = $('#btn-lev-crit'); if (bl) bl.addEventListener('click', () => { renderCriticos(); $('#painel-crit').classList.add('aberto'); });
+    const per = S.pgr ? resumoPericulosidade() : {}, pk = Object.keys(per);
+    if (pk.length) { $('#lev-info').innerHTML += `<div class="aviso" style="display:block;margin-top:6px"><b>Possível periculosidade no PGR:</b> ${pk.map(k => `<button type="button" class="tag ver tag-btn" data-per-ab="${esc(k)}" title="Ver os GES e funções">${esc(k)}: ${per[k].ges.size} GES, ${per[k].cargos.size} função(ões)</button>`).join(' ')} <small>(${esc(Array.from(new Set(pk.flatMap(k => Array.from(per[k].fatores)))).join('; '))})</small></div>`; $$('#lev-info [data-per-ab]').forEach(b => b.addEventListener('click', () => abrirRiscosPgr({ grupo: 'P:' + b.dataset.perAb }))); }
     $$('#lev-info [data-flt]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.flt; S.filtroLev = Object.assign(S.filtroLev || { texto: '' }, { tipo: (S.filtroLev && S.filtroLev.tipo === v) ? '' : v }); renderLevantamento(); }));
   }
   // célula do agente: mostra sempre o nome como está no PGR e deixa claro quando a linha está pendente
@@ -3859,15 +3872,138 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     }));
     el.querySelectorAll('[data-ci-fis]').forEach(b => b.addEventListener('click', () => { const k = Number(b.dataset.ciFis); const t = el.querySelector(`[data-ci-tipo="${k}"]`).value; if (!t) return; reg(k, 'Tipo de avaliação definido: ' + t); for (const l of linhasDe(k)) { l.tipo = t; if (t !== 'Avaliação qualitativa' && t !== 'Químico (laboratório)') l.agente = ''; l.verificar = false; l.obs = (l.fatorOriginal || '') + ' | tipo definido pelo usuário'; } renderCriticos(); renderLevantamento(); }));
   }
+  // ---- todos os riscos do PGR (inclusive acidentes e ergonômicos) com filtro por risco, função e GES
+  const PERIC = [
+    { re: /choque|eletric|energia eletrica|alta tensao|arco eletrico|nr[-\s]?10\b/, rot: 'Energia elétrica (NR-16 Anexo 4)' },
+    { re: /inflama|combustiv|\bglp\b|gas liquefeito|abastecimento|gas de cozinha/, rot: 'Inflamáveis (NR-16 Anexo 2)' },
+    { re: /explos/, rot: 'Explosão/explosivos: verificar (NR-16 Anexo 1 ou 2)' },
+    { re: /radia\w*\s+ionizante/, nao: /nao[-\s]?ionizante/, rot: 'Radiações ionizantes (NR-16, Portaria 518)' },
+    { re: /roubo|violencia fisica|assalto|seguranca patrimonial|vigilan/, rot: 'Roubos ou violência (NR-16 Anexo 3)' },
+    { re: /motocicleta|motoboy|\bmoto\b/, rot: 'Motocicleta (NR-16 Anexo 5)' }
+  ];
+  function periculosidadeDe(fator) { const f = Classificar.norm(fator); const p = PERIC.find(x => x.re.test(f) && !(x.nao && x.nao.test(f))); return p ? p.rot : ''; }
+  const ROT_GR = { fisicos: 'Físico', quimicos: 'Químico', biologicos: 'Biológico', ergonomicos: 'Ergonômico', acidentes: 'Acidente', mecanicos: 'Acidente', psicossociais: 'Psicossocial' };
+  const grupoRot = g => ROT_GR[g] || (/^ergon/.test(g) ? 'Ergonômico' : /^(acid|mecan)/.test(g) ? 'Acidente' : /^psico/.test(g) ? 'Psicossocial' : g || '');
+  function linhasRiscosPgr() {
+    if (!S.pgr) return [];
+    const out = [];
+    for (const g of S.pgr.ges) for (const r of (g.riscos || [])) out.push({ ges: g.codigo, nome: g.nome, cargos: g.cargos || [], expostos: g.expostos, grupo: grupoRot(r.grupo), fator: r.fator, peric: periculosidadeDe(r.fator) });
+    const nG = x => { const n = Number(x); return isNaN(n) ? Infinity : n; };
+    return out.sort((a, b) => nG(a.ges) - nG(b.ges) || a.grupo.localeCompare(b.grupo) || a.fator.localeCompare(b.fator));
+  }
+  function resumoPericulosidade() {
+    const m = {};
+    for (const l of linhasRiscosPgr().filter(x => x.peric)) { m[l.peric] = m[l.peric] || { ges: new Set(), cargos: new Set(), fatores: new Set() }; m[l.peric].ges.add(l.ges); l.cargos.forEach(c => m[l.peric].cargos.add(c)); m[l.peric].fatores.add(l.fator); }
+    return m;
+  }
+  function filtradasRiscosPgr() {
+    const F = S.filtroRiscos || (S.filtroRiscos = { grupo: '', risco: '', funcao: '', ges: '' });
+    const fr = Classificar.norm(F.risco), ff = Classificar.norm(F.funcao);
+    return linhasRiscosPgr().filter(l => (!F.grupo || (F.grupo === 'PERIC' ? !!l.peric : F.grupo.startsWith('P:') ? l.peric === F.grupo.slice(2) : l.grupo === F.grupo)) && (!fr || Classificar.norm(l.fator).includes(fr)) && (!ff || l.cargos.some(c => Classificar.norm(c).includes(ff)) || Classificar.norm(l.nome).includes(ff)) && (!F.ges || String(l.ges) === F.ges));
+  }
+  function renderRiscosPgr() {
+    const el = $('#riscos-lista');
+    if (!S.pgr) { el.innerHTML = '<p>Leia um PGR para ver os riscos.</p>'; return; }
+    const F = S.filtroRiscos || (S.filtroRiscos = { grupo: '', risco: '', funcao: '', ges: '' });
+    const todas = linhasRiscosPgr(), ls = filtradasRiscosPgr(), per = resumoPericulosidade();
+    const grupos = Array.from(new Set(todas.map(l => l.grupo))).sort();
+    const gesL = Array.from(new Set(todas.map(l => String(l.ges))));
+    let h = `<div class="grid-f" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+      <div class="campo"><label>Grupo</label><select id="rf-grupo"><option value="">Todos</option><option value="PERIC" ${F.grupo === 'PERIC' ? 'selected' : ''}>Possível periculosidade</option>${grupos.map(g => `<option ${F.grupo === g ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select></div>
+      <div class="campo"><label>Risco</label><input id="rf-risco" value="${esc(F.risco)}" placeholder="ex.: choque, ruído, poeira"></div>
+      <div class="campo"><label>Função</label><input id="rf-funcao" value="${esc(F.funcao)}" placeholder="ex.: manutenção"></div>
+      <div class="campo"><label>GES</label><select id="rf-ges"><option value="">Todos</option>${gesL.map(g => `<option ${F.ges === g ? 'selected' : ''}>${esc(g)}</option>`).join('')}</select></div></div>`;
+    const pk = Object.keys(per);
+    h += `<div class="botoes" style="margin:6px 0">${pk.length ? '<b>Possível periculosidade:</b> ' + pk.map(k => `<button type="button" class="tag ver tag-btn${F.grupo === 'P:' + k ? ' ativo' : ''}" data-rf-per="${esc(k)}">${esc(k)}: ${per[k].ges.size} GES, ${per[k].cargos.size} função(ões)</button>`).join(' ') : '<span class="tag ok">Nenhum risco com indício de periculosidade no PGR</span>'} <button type="button" class="sec" id="rf-limpar">Limpar filtros</button></div>`;
+    h += `<p><small>${ls.length} de ${todas.length} riscos do PGR (todos os grupos, inclusive acidentes e ergonômicos). Em ordem de GES.</small></p>`;
+    h += '<div style="overflow:auto"><table class="param"><tr><th>Item</th><th>GES</th><th>Funções</th><th>Grupo</th><th>Risco (como no PGR)</th><th>Periculosidade</th></tr>' + ls.map((l, i) => `<tr${l.peric ? ' class="rf-per"' : ''}><td>${i + 1}</td><td><b>${esc(l.ges)}</b><br><small>${esc(l.nome || '')}${l.expostos != null ? ', ' + esc(l.expostos) + ' exp.' : ''}</small></td><td><small>${esc(l.cargos.join('; '))}</small></td><td>${esc(l.grupo)}</td><td>${esc(l.fator)}</td><td>${l.peric ? `<span class="tag ver">${esc(l.peric)}</span>` : ''}</td></tr>`).join('') + '</table></div>';
+    h += `<div class="botoes"><button type="button" class="pri" id="rf-lp" ${ls.length ? '' : 'disabled'}>Marcar as funções filtradas no LP</button><button type="button" class="sec" id="rf-excel" ${ls.length ? '' : 'disabled'}>Baixar Excel (filtro)</button></div>`;
+    el.innerHTML = h;
+    const set = (k, v) => { S.filtroRiscos[k] = v; renderRiscosPgr(); };
+    $('#rf-grupo').addEventListener('change', e => set('grupo', e.target.value));
+    $('#rf-ges').addEventListener('change', e => set('ges', e.target.value));
+    ['risco', 'funcao'].forEach(k => { const i = $('#rf-' + k); let t; i.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.filtroRiscos[k] = i.value; renderRiscosPgr(); const n = $('#rf-' + k); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 300); }); });
+    el.querySelectorAll('[data-rf-per]').forEach(b => b.addEventListener('click', () => set('grupo', F.grupo === 'P:' + b.dataset.rfPer ? '' : 'P:' + b.dataset.rfPer)));
+    $('#rf-limpar').addEventListener('click', () => { S.filtroRiscos = { grupo: '', risco: '', funcao: '', ges: '' }; renderRiscosPgr(); });
+    $('#rf-lp').addEventListener('click', () => {
+      const ff = Classificar.norm(F.funcao), ch = new Set();
+      for (const l of ls) for (const c of l.cargos) if (!ff || Classificar.norm(c).includes(ff) || Classificar.norm(l.nome).includes(ff)) ch.add(l.ges + '|' + Classificar.norm(c));
+      S.lpSelecao = Array.from(new Set((S.lpSelecao || []).concat(Array.from(ch))));
+      $('#painel-riscos').classList.remove('aberto'); abrirPainelLP();
+      const cx = $$('#lp-lista input[type=checkbox]').filter(c => ch.has(c.value)); confirmarSemColab(cx); aplicarLP(false);
+    });
+    $('#rf-excel').addEventListener('click', async () => {
+      const wb = new ExcelJS.Workbook(), ws = wb.addWorksheet('Riscos do PGR');
+      ws.columns = [{ header: 'Item', width: 7 }, { header: 'GES', width: 9 }, { header: 'Nome do GES', width: 30 }, { header: 'Funções', width: 50 }, { header: 'Expostos', width: 10 }, { header: 'Grupo', width: 14 }, { header: 'Risco (como no PGR)', width: 45 }, { header: 'Possível periculosidade', width: 40 }];
+      ws.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } }; ws.getRow(1).eachCell(c => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002E7F' } }; });
+      ls.forEach((l, i) => ws.addRow([i + 1, l.ges, l.nome || '', l.cargos.join('; '), l.expostos ?? '', l.grupo, l.fator, l.peric]));
+      ws.autoFilter = { from: 'A1', to: 'H1' }; ws.views = [{ state: 'frozen', ySplit: 1 }];
+      baixar(new Blob([await wb.xlsx.writeBuffer()], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'Riscos do PGR - ' + (S.cadastro.empresa || 'empresa').replace(/[\\/:*?"<>|]/g, '').slice(0, 60) + '.xlsx');
+    });
+  }
+  function abrirRiscosPgr(filtro) { if (filtro) S.filtroRiscos = Object.assign({ grupo: '', risco: '', funcao: '', ges: '' }, filtro); renderRiscosPgr(); $('#painel-riscos').classList.add('aberto'); }
+
+  // a escolha das funções vale na hora (marcar/desmarcar já atualiza levantamento, escopo e preço)
+  function aplicarLP(fechar) {
+    if (!S.pgr) return;
+    S.lpSelecao = $$('#lp-lista input[type=checkbox]:checked').map(c => c.value);
+    const posterior = S.linhas.filter(l => l.lpPosterior);
+    S.linhas = S.linhas.filter(l => l.tipo !== 'Periculosidade (por cargo)').concat(Classificar.linhasPericulosidade(S.pgr, S.lpSelecao));
+    if (!S.lpSelecao.length) S.linhas = S.linhas.concat(posterior); // sem funções escolhidas, mantém a quantidade "a definir"
+    S.incluirLP = S.lpSelecao.length > 0 || posterior.length > 0; ordenar(); Motor.aplicarPlano(S.linhas, S.regras, S.plano, true);
+    sincronizarTipoLP();
+    if (fechar) $('#painel-lp').classList.remove('aberto');
+    if (S.passo === 2) renderLevantamento();
+    if (S.passo === 3) renderEscopo();
+    if (S.passo === 5) renderResultado();
+    const info = $('#lp-info'); if (info) info.dataset.sel = S.lpSelecao.length;
+    if (!fechar && $('#painel-lp').classList.contains('aberto')) { const y = $('#painel-lp').scrollTop; abrirPainelLP(); $('#painel-lp').scrollTop = y; }
+  }
+  // GES sem colaborador no PGR: quem emite decide se inclui a periculosidade
+  function semColab(c) { const e = c.expostos != null ? c.expostos : c.expostosGes; return e !== null && e !== undefined && e !== '' && Number(e) === 0; }
+  function confirmarSemColab(caixas) {
+    const sc = caixas.filter(c => c.checked && c.dataset.semcol === '1');
+    if (!sc.length) return true;
+    const ok = confirm(`Deseja incluir a avaliação de periculosidade?\n\nGES sem colaborador (0 expostos no PGR):\n- ${sc.map(c => c.dataset.rot).join('\n- ')}\n\nOK inclui mesmo assim. Cancelar deixa de fora.`);
+    if (!ok) sc.forEach(c => { c.checked = false; });
+    Ocorrencias.registrar(S, { origem: 'Laudo de Periculosidade', acao: (ok ? 'Incluída' : 'Não incluída') + ' periculosidade em GES sem colaborador: ' + sc.map(c => c.dataset.rot).join('; ') });
+    return ok;
+  }
+  // conferência por GES: avaliações de LP x colaboradores e funções do GES
+  function alertasLP() {
+    if (!S.pgr) return [];
+    const ls = S.linhas.filter(l => l.tipo === T_LP && l.ges !== '' && l.ges != null), por = {};
+    for (const l of ls) { const k = String(l.ges); por[k] = (por[k] || 0) + (Number(l.qtdAjustada ?? l.qtdSugerida ?? 1) || 1); }
+    const per = new Set(linhasRiscosPgr().filter(x => x.peric).map(x => String(x.ges))), out = [];
+    for (const g of S.pgr.ges) {
+      const k = String(g.codigo), n = por[k] || 0; if (!n && !per.has(k)) continue;
+      const exp = g.expostos, nc = (g.cargos || []).length;
+      if (n && exp !== null && exp !== undefined && exp !== '' && n > Number(exp)) out.push({ ges: k, msg: `Validar as funções do GES ${k}: ${n} avaliação(ões) de periculosidade para ${exp} colaborador(es) no PGR. Não se gera periculosidade para função sem colaborador exercendo.` });
+      else if (n && per.has(k) && n < nc) out.push({ ges: k, msg: `Validar as funções do GES ${k}: ${n} de ${nc} função(ões) com avaliação de periculosidade, e o PGR indica possível periculosidade no GES.` });
+      else if (!n && per.has(k) && Number(exp) > 0) out.push({ ges: k, msg: `GES ${k}: o PGR indica possível periculosidade (${exp} colaborador(es)), mas nenhuma função foi marcada no LP.` });
+    }
+    return out.sort((a, b) => (Number(a.ges) || 0) - (Number(b.ges) || 0));
+  }
+  // resumo curto: funções do LP x quantidade
+  function resumoLP() {
+    const ls = S.linhas.filter(l => l.tipo === T_LP);
+    if (!ls.length) return '';
+    const cg = S.pgr ? Classificar.cargosParaLP(S.pgr) : [];
+    const it = ls.map(l => { const c = cg.find(x => String(x.ges) === String(l.ges) && Classificar.norm(x.cargo) === Classificar.norm(l.agente)); const q = Number(l.qtdAjustada ?? l.qtdSugerida ?? 1) || 1; return `${esc(l.agente || 'função')}${l.ges !== '' && l.ges != null ? ' <small>(GES ' + esc(l.ges) + ')</small>' : ''} x ${q}${c && semColab(c) ? ' <span class="tag ver">GES sem colaborador</span>' : ''}`; });
+    const tot = ls.reduce((a, l) => a + (Number(l.qtdAjustada ?? l.qtdSugerida ?? 1) || 1), 0);
+    return `<div class="lp-resumo"><b>LP (${tot} função(ões)):</b> ${it.join('; ')}</div>`;
+  }
   function abrirPainelLP() {
     if (!S.pgr) { $('#lev-info').innerHTML = '<span class="tag ver">O LP por função usa os cargos do PGR. Sem PGR, adicione linhas "Periculosidade (por cargo)" à mão com o nome da função.</span>'; return; }
     const cargos = Classificar.cargosParaLP(S.pgr);
+    const perGes = {}; for (const l of linhasRiscosPgr().filter(x => x.peric)) { perGes[l.ges] = perGes[l.ges] || new Set(); perGes[l.ges].add(l.fator + ' → ' + l.peric); }
+    const alG = {}; alertasLP().forEach(a => { alG[a.ges] = a.msg; });
     const sel = S.lpSelecao || (S.incluirLP ? cargos.filter(c => c.operacional).map(c => c.chave) : []);
     let h = '<table class="param"><tr><th></th><th>GES</th><th>Função</th><th>Expostos</th></tr>';
     let gAtual = null;
     for (const c of cargos) {
-      if (c.ges !== gAtual) { gAtual = c.ges; h += `<tr class="sub"><td colspan="4"><b>GES ${c.ges}</b> ${esc(c.nome)}${c.operacional ? '' : ' <small>(sem risco físico, químico ou biológico)</small>'}</td></tr>`; }
-      h += `<tr><td><input type="checkbox" value="${esc(c.chave)}" data-oper="${c.operacional ? 1 : 0}" ${sel.includes(c.chave) ? 'checked' : ''}></td><td>${c.ges}</td><td>${esc(c.cargo)}</td><td class="num">${c.expostos != null ? c.expostos : '<small>GES: ' + (c.expostosGes ?? '?') + '</small>'}</td></tr>`;
+      if (c.ges !== gAtual) { gAtual = c.ges; h += `<tr class="sub"><td colspan="4"><b>GES ${c.ges}</b> ${esc(c.nome)}${c.operacional ? '' : ' <small>(sem risco físico, químico ou biológico)</small>'}${perGes[c.ges] ? `<br><span class="tag ver">Possível periculosidade: ${esc(Array.from(perGes[c.ges]).join('; '))}</span>` : ''}${alG[c.ges] ? `<div class="lp-alertas"><div>&#9888; ${esc(alG[c.ges])}</div></div>` : ''}</td></tr>`; }
+      h += `<tr><td><input type="checkbox" value="${esc(c.chave)}" data-oper="${c.operacional ? 1 : 0}" data-peric="${perGes[c.ges] ? 1 : 0}" data-semcol="${semColab(c) ? 1 : 0}" data-rot="${esc(c.cargo + ' (GES ' + c.ges + ')')}" ${sel.includes(c.chave) ? 'checked' : ''}></td><td>${c.ges}</td><td>${esc(c.cargo)}${semColab(c) ? ' <span class="tag ver">GES sem colaborador</span>' : ''}</td><td class="num">${c.expostos != null ? c.expostos : '<small>GES: ' + (c.expostosGes ?? '?') + '</small>'}</td></tr>`;
     }
     h += '</table>';
     $('#lp-lista').innerHTML = h || '<p>O PGR não trouxe cargos.</p>';
@@ -3894,23 +4030,21 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     });
     $('#btn-crit-fechar').addEventListener('click', () => $('#painel-crit').classList.remove('aberto'));
     $('#btn-lp-fechar').addEventListener('click', () => $('#painel-lp').classList.remove('aberto'));
-    $('#btn-lp-todas').addEventListener('click', () => $$('#lp-lista input[type=checkbox]').forEach(c => c.checked = true));
-    $('#btn-lp-oper').addEventListener('click', () => $$('#lp-lista input[type=checkbox]').forEach(c => c.checked = c.dataset.oper === '1'));
-    $('#btn-lp-nenhuma').addEventListener('click', () => $$('#lp-lista input[type=checkbox]').forEach(c => c.checked = false));
-    $('#btn-lp-aplicar').addEventListener('click', () => {
-      S.lpSelecao = $$('#lp-lista input[type=checkbox]:checked').map(c => c.value);
-      S.linhas = S.linhas.filter(l => l.tipo !== 'Periculosidade (por cargo)').concat(Classificar.linhasPericulosidade(S.pgr, S.lpSelecao));
-      S.incluirLP = S.lpSelecao.length > 0; ordenar(); Motor.aplicarPlano(S.linhas, S.regras, S.plano, true);
-      sincronizarTipoLP();
-      $('#painel-lp').classList.remove('aberto'); renderLevantamento();
-      if (S.passo === 4) { const tp = tiposDe(S.logistica.tipoLaudo); $$('#log-tipo input').forEach(c => { c.checked = !!tp[c.value]; }); renderLpAviso(); }
-    });
+    $('#btn-lp-todas').addEventListener('click', () => { const cx = $$('#lp-lista input[type=checkbox]'); cx.forEach(c => c.checked = true); confirmarSemColab(cx); aplicarLP(false); });
+    $('#btn-lp-oper').addEventListener('click', () => { const cx = $$('#lp-lista input[type=checkbox]'); cx.forEach(c => c.checked = c.dataset.oper === '1'); confirmarSemColab(cx); aplicarLP(false); });
+    $('#btn-lp-peric').addEventListener('click', () => { const cx = $$('#lp-lista input[type=checkbox]'); cx.forEach(c => c.checked = c.dataset.peric === '1'); confirmarSemColab(cx); aplicarLP(false); });
+    $('#btn-riscos').addEventListener('click', () => abrirRiscosPgr());
+    $('#btn-riscos-fechar').addEventListener('click', () => $('#painel-riscos').classList.remove('aberto'));
+    $('#btn-lp-nenhuma').addEventListener('click', () => { $$('#lp-lista input[type=checkbox]').forEach(c => c.checked = false); aplicarLP(false); });
+    $('#btn-lp-aplicar').addEventListener('click', () => aplicarLP(true));
+    $('#lp-lista').addEventListener('change', ev => { if (ev.target.matches('input[type=checkbox]')) { confirmarSemColab([ev.target]); aplicarLP(false); } });
     $('#btn-limpar-ver').addEventListener('click', () => { S.linhas.forEach(l => { l.verificar = false; l.obs = (l.obs || '').replace(/\s*\|\s*VERIFICAR.*$/, ''); }); renderLevantamento(); });
     const dl = $('#lista-exames'); dl.innerHTML = S.exames.itens.map(e => `<option value="${esc(e.nome)}">`).join('');
   }
 
   // ------------------------------------------------------------------ passo 3: escopo
   function renderEscopo() {
+    { sincronizarTipoLP(); const tp = tiposDe(S.logistica.tipoLaudo); $$('#log-tipo input').forEach(c => { c.checked = !!tp[c.value]; }); renderLpAviso(); }
     $('#chk-mineracao').checked = !!S.mineracao;
     $('#mineracao-info').innerHTML = S.mineracao ? `Ativo: poeira mineral e sílica com <b>${S.regras.valores.nr22_medicoes_poeira.valor} medições por GES</b> (NR-22 Anexo V, item 4.2). ${/^0[5-9]/.test(String(S.cadastro.cnae || '').replace(/\D/g, '').slice(0, 2)) ? 'Sugerido pelo CNAE ' + S.cadastro.cnae + '.' : ''}` : 'Desligado: poeira e sílica seguem a regra geral (1 amostrador por GES).';
     const sel = $('#sel-plano'); sel.innerHTML = Object.keys(S.regras.planos).map(p => `<option ${p === S.plano ? 'selected' : ''}>${p}</option>`).join('');
@@ -3959,7 +4093,8 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const ls = lpLinhas(), post = ls.find(l => l.lpPosterior), def = ls.filter(l => !l.lpPosterior);
     el.hidden = false;
     if (def.length) {
-      el.innerHTML = `<b>LP:</b> ${def.length} função(ões) escolhida(s) no levantamento.${S.pgr ? ' <button class="sec" type="button" id="lp-av-escolher">Rever funções</button>' : ''}`;
+      const al = alertasLP();
+      el.innerHTML = `${resumoLP()}${al.length ? '<div class="lp-alertas">' + al.map(a => `<div>&#9888; ${esc(a.msg)}</div>`).join('') + '</div>' : ''}${S.pgr ? '<div class="linha"><button class="sec" type="button" id="lp-av-escolher">Rever funções</button></div>' : ''}`;
     } else {
       el.innerHTML = `<b>${post ? 'LP com funções a definir posteriormente.' : 'Nenhuma função definida para o LP.'}</b> ${post ? '' : 'Definir funções posteriormente?'}
         <div class="linha"><label style="margin:0">Quantidade de funções</label><input type="number" min="1" step="1" id="lp-av-qtd" value="${post ? esc(post.qtdAjustada) : ''}" placeholder="ex.: 5">
@@ -3974,7 +4109,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     sugerirDistancia();
     const L = S.logistica;
     $('#log-cidade').value = S.cadastro.cidade || ''; $('#log-dist').value = L.distancia ?? 0; $('#log-modo').value = L.modo || (L.pernoite ? 'pernoite' : 'auto');
-    $('#log-dias').value = L.diasAjustado ?? ''; $('#log-resp').value = L.responsavel || ''; sincronizarTipoLP(); const tp = tiposDe(L.tipoLaudo); $$('#log-tipo input').forEach(c => { c.checked = !!tp[c.value]; }); renderLpAviso(); $('#log-data').value = L.data || hoje();
+    $('#log-dias').value = L.diasAjustado ?? ''; $('#log-resp').value = L.responsavel || ''; $('#log-data').value = L.data || hoje();
     const vs = $('#log-vig'); vs.innerHTML = (S.exames.vigencias || []).map(v => `<option value="${v.campo}" ${v.campo === L.vigencia ? 'selected' : ''}>${v.rotulo}</option>`).join('');
     const dlc = $('#lista-cidades'); dlc.innerHTML = Object.keys(S.distancias.cidades).sort().map(c => `<option value="${esc(c)}">`).join('');
   }
@@ -4026,7 +4161,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     h += `<tr><th colspan="4">3 - MATERIAL DE EXPEDIENTE E OUTROS</th></tr><tr><th>Especificação</th><th>Quant.</th><th>Valor unit.</th><th>Total</th></tr>`;
     h += l('ART - CREA', 1, fmt(c.c6.art), fmt(c.c6.art)) + l('Postagem para amostra' + (c.c6.postQ !== c.c6.postAuto ? ' <small>(ajustada; automático ' + c.c6.postAuto + ')</small>' : ''), c.c6.postQ, fmt(c.c6.postV), fmt(c.c6.postQ * c.c6.postV)) + l('Material administrativo (folhas)', c.c6.folhas, fmt(c.c6.folhaV), fmt(c.c6.folhas * c.c6.folhaV)) + sub('Custos (6)', c.c6.total);
     h += `<tr><th colspan="4">4 - OUTROS TIPOS DE SERVIÇOS</th></tr><tr><th>Descrição</th><th>Quantidade</th><th>Valor unit.</th><th>Valor total</th></tr>`;
-    for (const s of R.secao4) if (s.qtd > 0 || s.total > 0) h += l(`<a href="#" class="ir-lev" data-tipo="${esc(s.tipo)}" data-agente="${s.tipo === 'Químico (laboratório)' ? esc(String(s.descricao).replace(/ \(valor manual\)$/, '')) : ''}" title="Ver essas linhas no levantamento">${esc(s.descricao)}</a>` + (s.detalhe ? `<br><small>${esc(s.detalhe)}</small>` : ''), s.qtd, fmt(s.valorUnit), fmt(s.total));
+    for (const s of R.secao4) if (s.qtd > 0 || s.total > 0) h += l(`<a href="#" class="ir-lev" data-tipo="${esc(s.tipo)}" data-agente="${s.tipo === 'Químico (laboratório)' ? esc(String(s.descricao).replace(/ \(valor manual\)$/, '')) : s.tipo === 'Avaliação qualitativa' || s.tipo === 'Periculosidade (por cargo)' ? esc(String(s.descricao).replace(/^[^:]*:\s*/, '').replace(/\s*\(GES [^)]*\)$/, '').slice(0, 40)) : ''}" title="Ver essas linhas no levantamento">${esc(s.descricao)}</a>` + (s.detalhe ? `<br><small>${esc(s.detalhe)}</small>` : ''), s.qtd, fmt(s.valorUnit), fmt(s.total));
     h += sub('Custos (7)', c.c7.total);
     h += `<tr class="tot"><td colspan="3">5 - Custos totais (1+2+3+4+5+6+7)</td><td class="num">${fmt(c.total)}</td></tr>`;
     h += `<tr><td colspan="3">6 - BDI (${(c.bdiPct * 100).toFixed(0)}%)</td><td class="num">${fmt(c.bdi)}</td></tr>`;
@@ -4072,7 +4207,8 @@ Responsável: ${S.logistica.responsavel || ''}    Data: ${(S.logistica.data || '
     }
     const manuais = R.linhas.filter(x => x.ativa && x.valorManual !== null && x.valorManual !== undefined && x.valorManual !== '');
     if (manuais.length) $('#res-ver').innerHTML += `<div class="tag ver">${manuais.length} item(ns) com valor manual: ${Array.from(new Set(manuais.map(x => (x.agente || x.fatorOriginal) + ' R$ ' + fmt(x.valorManual) + (x.motivoManual ? ' [motivo: ' + x.motivoManual + ']' : ' [SEM MOTIVO REGISTRADO]')))).map(esc).join('; ')}</div>`;
-    if (tiposDe(S.logistica.tipoLaudo).LP && !lpLinhas().length) $('#res-ver').innerHTML += `<div class="alerta-forte"><b>LP marcado sem funções definidas:</b> o LP não está no preço. Volte à logística (passo 4) e informe a quantidade de funções ou escolha as funções do PGR.</div>`;
+    { const al = alertasLP().filter(a => S.linhas.some(l => l.tipo === T_LP && String(l.ges) === a.ges)); if (al.length) $('#res-ver').innerHTML += `<div class="alerta-forte"><b>Laudo de Periculosidade:</b> ${al.map(a => esc(a.msg)).join('<br>')}</div>`; }
+    if (tiposDe(S.logistica.tipoLaudo).LP && !lpLinhas().length) $('#res-ver').innerHTML += `<div class="alerta-forte"><b>LP marcado sem funções definidas:</b> o LP não está no preço. Volte ao escopo (passo 3) e informe a quantidade de funções ou escolha as funções do PGR.</div>`;
     if (S.gruposExcluidos.length) $('#res-ver').innerHTML += `<div class="alerta-demo">Fora da precificação por decisão: <b>${S.gruposExcluidos.map(g => ROT_GRUPO[g]).join(', ')}</b>. No esboço esses agentes aparecem como não avaliados neste orçamento.</div>`;
     if (S.demo && S.demo.manual && S.resultado) { const pv = S.resultado.custos.proposta, dif = pv - S.demo.manual; $('#res-ver').innerHTML += `<div class="alerta-demo"><b>Laudo teste:</b> ferramenta R$ ${fmt(pv)} x planilha manual R$ ${fmt(S.demo.manual)} (${S.demo.dataManual}), diferença R$ ${fmt(dif)} (${(dif / S.demo.manual * 100).toFixed(1).replace('.', ',')}%). Itens pendentes ainda estão a R$ 0,00 até a validação nos pontos críticos.</div>`; }
   }
@@ -4148,7 +4284,7 @@ Responsável: ${S.logistica.responsavel || ''}    Data: ${(S.logistica.data || '
     const wpr = wb.getWorksheet('Precificação'); const cx = Rx.custos;
     const put = (ref, val) => { wpr.getCell(ref).value = val; };
     put('H8', cx.c1.diariaQ); put('H9', cx.c1.meiaQ); put('H13', cx.c2.hLevEng); put('H14', cx.c2.hCampo); put('H15', cx.c2.hLanc); put('H16', cx.c2.hRev); put('H17', cx.c2.hEnt);
-    { const q = (Rx.secao4 || []).find(x => x.tipo === 'Avaliação qualitativa'); if (q && q.detalhe) { put('R19', 'Avaliação qualitativa: ' + q.detalhe); wpr.getCell('R19').alignment = { wrapText: true, vertical: 'middle' }; } }
+    { const qs = (Rx.secao4 || []).filter(x => x.tipo === 'Avaliação qualitativa' && x.qtd > 0); if (qs.length) { put('R19', 'Avaliação qualitativa: ' + qs.map(x => x.descricao.replace(/^Avaliação qualitativa:\s*/, '') + ' (' + x.qtd + ')').join('; ')); wpr.getCell('R19').alignment = { wrapText: true, vertical: 'middle' }; } }
     put('H35', cx.c5.kmQ); put('H36', cx.c5.refQ); put('AC9', cx.c6.postQ); put('AC10', cx.c6.folhas);
     ws.getCell('B7').value = Rx.logistica.modo === 'pernoite' ? 'Sim' : 'Não'; ws.getCell('B9').value = Rx.dias;
     wb.calcProperties.fullCalcOnLoad = true;
