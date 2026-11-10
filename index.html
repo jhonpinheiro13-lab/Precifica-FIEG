@@ -923,7 +923,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   'use strict';
 
   const GRUPOS = ['fisicos', 'quimicos', 'biologicos', 'ergonomicos', 'acidentes', 'mecanicos', 'psicossociais'];
-  const RE_GES = /^\s*(GHE|GES)\s*(\d{3,5})\s*[-–]\s*(.+)$/i;
+  const RE_GES = /^\s*(GHE|GES)\s*(\d{1,5})\s*[-–]\s*(.+)$/i;
   const RE_EXP = /Total de trabalhadores[^:]*:\s*(\d+)/i;
 
   function norm(s) {
