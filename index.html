@@ -4641,9 +4641,12 @@ tr.tot td{font-weight:bold;background:#f2f2f2}.topico{break-inside:avoid;page-br
       const titulo = (l0.unidadeCargo ? 'GHE ' + (g || 's/n') + ' - Cargo: ' : 'GES ' + g + ' - ') + (l0.nome || '');
       const med = ls.filter(incl), nc = ls.filter(l => l.escopo === 'nao' && !excl(l)), outros = ls.filter(l => !incl(l) && l.escopo !== 'nao' && !excl(l) && l.qtd > 0);
       const repres = ls.filter(x => x.tipo === 'Ruído (dosimetria)' && x.qtd === 0 && x.notaRuido && x.escopo !== 'nao');
-      const aus = !med.length && !nc.length && !outros.length && !repres.length;
+      const semMed = !med.length && !nc.length && !outros.length && !repres.length;
+      const riscosSc = ls.filter(l => l.tipo !== 'Ausência de risco' && l.escopo !== 'nao').map(l => l.tipo === 'Químico (laboratório)' ? (l.agente || String(l.fatorOriginal || 'Químico')) : l.tipo === 'Avaliação qualitativa' ? (l.agente || l.fatorOriginal || '') : l.tipo === 'Ruído (dosimetria)' ? 'Ruído' : l.tipo.replace(/ \(.*$/, ''));
+      const semColabGes = semMed && riscosSc.length > 0 && ls.every(l => semColabLinha(l) || l.tipo === 'Ausência de risco');
+      const aus = semMed && !semColabGes;
       if (aus) ausentes.push(titulo);
-      analit += `<div class="ges"><h3>${esc(titulo)}</h3><p><b>Funções:</b> ${esc(funcoes) || 'não informadas'}</p><p><b>Colaboradores:</b> ${l0.expostos ?? '?'}</p><p><b>Riscos / Medições:</b>${aus ? ' Ausência de riscos físicos, químicos e biológicos' : ''}</p>`;
+      analit += `<div class="ges"><h3>${esc(titulo)}</h3><p><b>Funções:</b> ${esc(funcoes) || 'não informadas'}</p><p><b>Colaboradores:</b> ${l0.expostos ?? '?'}</p><p><b>Riscos / Medições:</b>${aus ? ' Ausência de riscos físicos, químicos e biológicos' : semColabGes ? ' GES sem colaborador no PGR, sem medição. Riscos constatados: ' + esc(Array.from(new Set(riscosSc)).join('; ')) : ''}</p>`;
       for (const l of med) analit += `<p>${pad(l.qtd)} - ${esc(rot(l))}${comPlano && l.escopo === 'cobrar' ? ' (' + T_().notaFora + ')' : ''}</p>`;
       for (const l of outros) analit += `<p class="fora">${pad(l.qtd)} - ${esc(rot(l))} (fora do escopo deste esboço)</p>`;
       for (const l of repres) analit += `<p class="fora">00 - Ruído: representado pela amostragem do GHE ${esc(g)}</p>`;
