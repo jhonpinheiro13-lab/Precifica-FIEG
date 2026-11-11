@@ -159,6 +159,8 @@
   textarea { min-height:520px; font-size:13px; }
   .painel { position:fixed; top:0; right:0; width:540px; max-width:100%; height:100vh; background:#fff; border-left:1px solid var(--borda); box-shadow:-8px 0 24px rgba(0,34,96,.14); transform:translateX(105%); visibility:hidden; transition:transform .25s, visibility .25s; overflow:auto; padding:20px; z-index:20; }
   .painel.aberto { transform:none; visibility:visible; }
+.painel-alca { position:absolute; left:0; top:0; width:8px; height:100%; cursor:ew-resize; background:linear-gradient(90deg, rgba(21,109,175,.35), transparent); z-index:21; }
+.painel-alca:hover { background:rgba(21,109,175,.35); }
   table.param input { width:110px; padding:4px 6px; }
   table.param td { font-size:12px; }
   small { color:var(--texto2); }
@@ -337,6 +339,9 @@
           <button class="sec" id="btn-tudo-cobrar">Cobrar tudo (sem plano)</button>
         </div>
         <small id="escopo-ajuda">Aplicar o plano marca como "coberto" o que o pacote já inclui. Depois você pode mudar linha a linha no passo 2 (coluna Escopo).</small>
+        <h3>GES sem colaborador</h3>
+        <label style="font-size:14px"><input type="checkbox" id="chk-semcolab-prop2"> Incluir GES sem colaborador na proposta (<span id="esc-nsc">0</span> GES com 0 colaboradores no PGR)</label>
+        <div style="margin:4px 0 10px"><small>Hoje a regra dá 0 avaliações a GES sem colaborador (ficam fora do preço). Marcado, cada um recebe a quantidade de 1 colaborador. O esboço de medições tem a própria opção, no passo 6.</small></div>
         <h3>Mineração (NR-22)</h3>
         <label style="font-size:14px"><input type="checkbox" id="chk-mineracao"> Empresa de mineração: aplicar o Anexo V da NR-22 nas poeiras minerais</label>
         <div id="mineracao-info" style="margin-top:6px"><small></small></div>
@@ -442,6 +447,7 @@
         <option value="plano">Só o coberto pelo plano</option>
         <option value="adicional">Só os adicionais (fora do plano)</option>
       </select>
+      <label style="margin:0;font-size:13px" title="GES com 0 colaboradores no PGR"><input type="checkbox" id="chk-semcolab-esb2"> Incluir GES sem colaborador no esboço (<span id="esb-nsc">0</span>)</label>
       <button class="sec" id="btn-esb-copiar">Copiar texto</button>
       <button class="sec" id="btn-esb-baixar">Baixar (HTML)</button>
       <select id="esb-print-opcao" style="width:auto"><option value="ambos">Resumo e analítico</option><option value="resumo">Só o resumo</option><option value="analitico">Só o analítico</option></select>
@@ -937,7 +943,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     const cadastro = { empresa: '', fantasia: '', cnpj: '', cidade: '', uf: '', cnae: '', grau: '', n_trab: '' };
     const ges = {};
     const avisos = [];
-    let atual = null, cadastroLido = false, fimInventario = false;
+    let atual = null, cadastroLido = false, fimInventario = false, fonteHdr = null;
     const n = doc.numPages;
     for (let p = 1; p <= n && !fimInventario; p++) {
       if (onProgress) onProgress(p, n);
@@ -1004,13 +1010,17 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       if (atual === null) continue;
 
       // ---- linhas da tabela de riscos (nesta página, inclusive continuação)
+      const fh = cels.find(c => /fonte\(?s?\)?\s*geradora|fontes?\s+geradoras?|circunst[aâ]ncias?\s+geradoras?/i.test(c.texto) && c.w < 160);
+      if (fh) fonteHdr = { x0: fh.x0, w: fh.w };
       for (const c of cels) {
         if (c.w > 70) continue;
         const g = norm(c.texto);
         if (!GRUPOS.includes(g)) continue;
         const fatorCel = cels.find(d => Math.abs(d.top - c.top) < 2.5 && Math.abs(d.x0 - c.x1) < 4 && d !== c);
         const fator = fatorCel ? limpa(fatorCel.texto) : '';
-        if (fator) ges[atual].riscos.push({ grupo: g, fator });
+        let fonte = '';
+        if (fonteHdr) { const fc = cels.find(d => Math.abs(d.top - c.top) < 2.5 && Math.abs(d.x0 - fonteHdr.x0) < 6 && d !== c && d !== fatorCel); if (fc) fonte = limpa(fc.texto); }
+        if (fator) ges[atual].riscos.push({ grupo: g, fator, fonte });
       }
     }
     // dedupe de riscos e ordenação
@@ -1517,10 +1527,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         return [{ tipo: T.QUIM, agente: '', obs: fator + ' | OUTROS: escolha um exame, cadastre um novo ou informe valor manual', verificar: true, outros: true }];
       }
       const r = casarExame(fator, exames, extras);
-      if (r.exame) {
-        const ver = r.como === 'contido' || r.como === 'aproximado';
-        return [{ tipo: T.QUIM, agente: r.exame, obs: ver ? `${fator} | exame casado por ${r.como} | VERIFICAR` : fator, verificar: ver }];
-      }
+      if (r.exame && (r.como === 'exato' || r.como === 'sinônimo')) return [{ tipo: T.QUIM, agente: r.exame, obs: fator, verificar: false }];
+      // casamento por aproximação ou por nome contido: NÃO substitui sozinho. Fica pendente, com a sugestão, até o usuário resolver (decisão de 11/11/2026).
+      if (r.exame) return [{ tipo: T.QUIM, agente: '', obs: `${fator} | PENDENTE: sugestão "${r.exame}" (casamento por ${r.como}). Confirme nos pontos críticos`, verificar: true, outros: true, semIdent: true, sugestao: r.exame, sugestaoComo: r.como }];
       // Químico sem identificação ou sem exame na base (ex.: "produtos químicos", "adubos químicos"): fica pendente como OUTROS
       // até o usuário validar (exame da base, cadastro novo, valor manual, qualitativa ou não entra). Decisão da gestão, 25/09/2026.
       return [{ tipo: T.QUIM, agente: '', obs: `${fator} | VALIDAR: químico sem identificação ou sem exame na base. Escolha exame, cadastre, informe valor manual ou marque qualitativa`, verificar: true, outros: true, semIdent: true }];
@@ -1536,11 +1545,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const vistos = new Set(); const itens = [];
       for (const r of g.riscos) {
         for (const c of classificar(r.grupo, r.fator, exames, extras)) {
-          c.fatorOriginal = r.fator; c.grupo = r.grupo;
+          c.fatorOriginal = r.fator; c.grupo = r.grupo; c.fonte = r.fonte || '';
           const k = c.tipo + '|' + norm(c.agente || c.fatorOriginal).slice(0, 40);
           if (vistos.has(k)) continue;
           vistos.add(k);
-          itens.push({ ges: g.codigo, nome: g.nome, expostos: g.expostos, tipo: c.tipo, agente: c.agente, obs: c.obs, verificar: c.verificar, fisico: !!c.fisico, outros: !!c.outros, semIdent: !!c.semIdent, ionizante: !!c.ionizante, fatorOriginal: c.fatorOriginal, grupo: c.grupo, qtdAjustada: null, valorManual: null, escopo: 'cobrar' });
+          itens.push({ ges: g.codigo, nome: g.nome, expostos: g.expostos, tipo: c.tipo, agente: c.agente, obs: c.obs, fonte: c.fonte || '', verificar: c.verificar, fisico: !!c.fisico, outros: !!c.outros, semIdent: !!c.semIdent, ionizante: !!c.ionizante, fatorOriginal: c.fatorOriginal, grupo: c.grupo, qtdAjustada: null, valorManual: null, escopo: 'cobrar' });
         }
       }
       if (!itens.length) itens.push({ ges: g.codigo, nome: g.nome, expostos: g.expostos, tipo: T.AUS, agente: '', obs: 'Nenhum agente físico, químico ou biológico no inventário', verificar: false, qtdAjustada: null, escopo: 'cobrar' });
@@ -1964,8 +1973,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     const ag = c.agente || 'agente não especificado';
     const t = c.tipo || '';
     if (/^OUTROS/.test(t)) return `O PGR registra o agente como "${ag}", sem identificar a substância. Sem a identificação do produto (FISPQ ou rótulo) não é possível definir o método de coleta nem o exame do laboratório. Não adotamos exame substituto para não precificar um método que pode não corresponder ao agente real. O item ficou fora do preço e deve ser confirmado com o cliente antes da medição.`;
-    if (/sem identifica|sem exame/i.test(t)) return `O agente "${ag}" não tem exame correspondente na tabela do laboratório contratado. Não adotamos exame por semelhança de nome sem validação técnica, porque o método de coleta e a análise podem ser diferentes. Pendente de cotação com o laboratório ou de definição do responsável técnico; o item ficou fora do preço.`;
-    if (/aproxima/i.test(t)) return `O exame foi associado a "${ag}" por semelhança de nome e ainda não foi confirmado. Mantivemos o exame sugerido apenas como referência, sujeito à validação do responsável técnico antes da proposta.`;
+    if (/cota[cç][aã]o/i.test(t)) return `O agente "${ag}" consta no PGR e não possui exame na tabela vigente do laboratório contratado. Foi solicitada cotação ao laboratório. O item permanece fora do preço até o retorno da cotação e a definição do responsável técnico.`;
+    if (/sem identifica|sem exame|pendente|aproxima/i.test(t)) return `O agente "${ag}" consta no PGR e não possui exame na tabela vigente do laboratório contratado. A definição do método de coleta e de análise depende de cotação com o laboratório ou de decisão do responsável técnico. O item permanece fora do preço até essa definição.`;
     if (/ionizante/i.test(t)) return `O PGR registra radiação ionizante (${ag}). Essa avaliação exige metodologia específica (normas CNEN) e pode caracterizar periculosidade, não sendo uma avaliação qualitativa comum. Não adotamos a precificação como qualitativa simples; é preciso confirmar com o cliente a existência e o tipo da fonte.`;
     if (/f[ií]sico n[aã]o reconhecido/i.test(t)) return `O agente físico "${ag}" não corresponde a nenhuma avaliação padronizada da Central. Mantivemos como avaliação qualitativa até a definição do tipo de avaliação pelo responsável técnico.`;
     if (/vibra/i.test(t)) return `O PGR não informa se a vibração é de corpo inteiro ou de mãos e braços. Mantivemos como corpo inteiro até a confirmação da atividade com o cliente.`;
@@ -3419,7 +3428,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     regras: null, exames: null, distancias: null, config: {},
     pgr: null, proposta: null,
     cadastro: { empresa: '', cnpj: '', cidade: '', uf: '', grau: '', n_trab: '', telefone: '', email: '' },
-    plano: 'Sem plano / avulso', incluirLP: false, lpSelecao: null, mineracao: false, descontoPct: null, esbocoFiltro: 'tudo', unidade: 'ges',
+    plano: 'Sem plano / avulso', incluirLP: false, lpSelecao: null, mineracao: false, descontoPct: null, esbocoFiltro: 'tudo', unidade: 'ges', semColab: { esboco: false, proposta: false },
     linhas: [],
     logistica: { distancia: 0, pernoite: false, modo: 'auto', diasAjustado: null, responsavel: '', tipoLaudo: 'LTCAT/LI', data: hoje(), vigencia: 'v2026' },
     resultado: null, resultadoTotal: null, passo: 1, arquivos: { pgr: null, proposta: null }, extras: { sinonimos: {}, exames: [] },
@@ -3461,7 +3470,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
       const t = tc.items.map(i => i.str).join(' ');
       if (/PLANILHA DE AN[AÁ]LISE DE CONDI/i.test(t)) pla++;
       if (/N[ºo°]\s*de Expostos/i.test(t) && /Matriz de Avalia/i.test(t)) mat++;
-      if (/Total de trabalhadores/i.test(t) && /(GES|GHE)\s*\d{3,}/.test(t)) sp++;
+      if (/Total de trabalhadores/i.test(t) && /(GES|GHE)\s*\d{1,}/.test(t)) sp++;
       if (sp + mat + pla >= 3) break;
     }
     if (sp >= mat && sp >= pla && sp) return 'splus';
@@ -3665,8 +3674,9 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const passaFiltro = (l, i) => {
       if (F.tipo === 'VERIFICAR' && !l.verificar) return false;
       if (F.tipo === 'CRITICOS') { if (!idxCrit.has(i)) return false; }
+      if (F.tipo === 'SEMCOLAB' && !semColabLinha(l)) return false;
       if (F.tipo && F.tipo.startsWith('grupo:') && Motor.grupoLinha(l) !== F.tipo.slice(6)) return false;
-      if (F.tipo && F.tipo !== 'VERIFICAR' && F.tipo !== 'CRITICOS' && !F.tipo.startsWith('grupo:') && l.tipo !== F.tipo) return false;
+      if (F.tipo && F.tipo !== 'VERIFICAR' && F.tipo !== 'CRITICOS' && F.tipo !== 'SEMCOLAB' && !F.tipo.startsWith('grupo:') && l.tipo !== F.tipo) return false;
       if (fq && !Classificar.norm([l.ges, l.nome, l.tipo, l.agente, l.fatorOriginal, l.obs, funcoesGes[String(l.ges)] || ''].join(' ')).includes(fq)) return false;
       return true;
     };
@@ -3713,12 +3723,19 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const nVer = S.linhas.filter(l => l.verificar).length;
     const nCrit = pontosCriticos().length;
     $('#lev-info').innerHTML = `${S.linhas.length} linhas${nVis !== S.linhas.length ? ` (mostrando ${nVis} pelo filtro)` : ''}.${S.gruposExcluidos.length ? ` <span class="tag ver">Fora da precificação: ${S.gruposExcluidos.map(g => ROT_GRUPO[g]).join(', ')}</span>` : ''} ${nVer ? `<button type="button" class="tag ver tag-btn${F.tipo === 'VERIFICAR' ? ' ativo' : ''}" data-flt="VERIFICAR" title="${F.tipo === 'VERIFICAR' ? 'Filtro ativo: clique para mostrar tudo' : 'Clique para mostrar só essas linhas'}">${nVer} marcadas VERIFICAR${F.tipo === 'VERIFICAR' ? ' (filtrando, clique para limpar)' : ''}</button>` : '<span class="tag ok">Nada pendente</span>'} ${nCrit ? `<button type="button" class="tag ver tag-btn${F.tipo === 'CRITICOS' ? ' ativo' : ''}" data-flt="CRITICOS" title="${F.tipo === 'CRITICOS' ? 'Filtro ativo: clique para mostrar tudo' : 'Clique para mostrar só as linhas dos pontos críticos'}">${nCrit} pontos críticos${F.tipo === 'CRITICOS' ? ' (filtrando, clique para limpar)' : ''}</button>` : ''} Linhas cinzas: ${T_().kpiPlano}. Riscadas: não entram.`;
+    const gsc = gesSemColab();
+    if (gsc.length) $('#lev-info').innerHTML += ` <button type="button" class="tag ver tag-btn${F.tipo === 'SEMCOLAB' ? ' ativo' : ''}" data-flt="SEMCOLAB" title="${F.tipo === 'SEMCOLAB' ? 'Filtro ativo: clique para mostrar tudo' : 'Clique para mostrar só os GES sem colaborador'}">${gsc.length} GES sem colaborador${F.tipo === 'SEMCOLAB' ? ' (filtrando, clique para limpar)' : ''}</button><div style="margin-top:4px"><small>GES sem colaborador: ${S.semColab.proposta ? '<b>incluídos na proposta</b>' : 'fora da proposta'} e ${S.semColab.esboco ? '<b>incluídos no esboço</b>' : 'fora do esboço'} (regra: 0 avaliações). Para mudar: passo 3 (proposta) e passo 6 (esboço).</small></div>`;
     $('#btn-crit').textContent = 'Pontos críticos' + (nCrit ? ' (' + nCrit + ')' : '');
     const nOut = S.linhas.filter(l => l.outros && !l.agente && (l.valorManual === null || l.valorManual === undefined) && l.escopo !== 'nao').length;
-    if (nOut) $('#lev-info').innerHTML += `<div class="alerta-forte">${nOut} linha(s) "OUTROS" ou químico sem identificação, sem exame nem valor. ${S.modulo === 'esboco' ? 'Elas precisam de definição antes do esboço final.' : 'Elas não entram no preço até você definir.'} <button class="mini2" id="btn-lev-crit">Resolver agora</button></div>`;
-    const bl = $('#btn-lev-crit'); if (bl) bl.addEventListener('click', () => { renderCriticos(); $('#painel-crit').classList.add('aberto'); });
+    if (nOut) {
+      const porAg = {}; S.linhas.forEach(l => { if (l.outros && !l.agente && (l.valorManual === null || l.valorManual === undefined) && l.escopo !== 'nao') { const k = l.fatorOriginal || l.obs || '?'; (porAg[k] = porAg[k] || []).push(l.ges); } });
+      const ags = Object.keys(porAg); const numG = g => { const n = Number(g); return isNaN(n) ? Infinity : n; };
+      const lista = ags.map(a => `<b>${esc(a)}</b> (GES ${esc(porAg[a].sort((x, y) => numG(x) - numG(y)).join(', '))})`).join('; ');
+      $('#lev-info').innerHTML += `<div class="alerta-forte">${nOut} linha(s) sem exame nem valor, em ${ags.length} agente(s): ${lista}. ${S.modulo === 'esboco' ? 'Precisam de definição antes do esboço final.' : 'Não entram no preço até você definir.'} No painel, cada agente aparece uma vez, com todos os GES. <button class="mini2" id="btn-lev-crit">Resolver agora</button></div>`;
+    }
     const per = S.pgr ? resumoPericulosidade() : {}, pk = Object.keys(per);
     if (pk.length) { $('#lev-info').innerHTML += `<div class="aviso" style="display:block;margin-top:6px"><b>Possível periculosidade no PGR:</b> ${pk.map(k => `<button type="button" class="tag ver tag-btn" data-per-ab="${esc(k)}" title="Ver os GES e funções">${esc(k)}: ${per[k].ges.size} GES, ${per[k].cargos.size} função(ões)</button>`).join(' ')} <small>(${esc(Array.from(new Set(pk.flatMap(k => Array.from(per[k].fatores)))).join('; '))})</small></div>`; $$('#lev-info [data-per-ab]').forEach(b => b.addEventListener('click', () => abrirRiscosPgr({ grupo: 'P:' + b.dataset.perAb }))); }
+    const bl = $('#btn-lev-crit'); if (bl) bl.addEventListener('click', () => { renderCriticos(); $('#painel-crit').classList.add('aberto'); });
     $$('#lev-info [data-flt]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.flt; S.filtroLev = Object.assign(S.filtroLev || { texto: '' }, { tipo: (S.filtroLev && S.filtroLev.tipo === v) ? '' : v }); renderLevantamento(); }));
   }
   // célula do agente: mostra sempre o nome como está no PGR e deixa claro quando a linha está pendente
@@ -3784,14 +3801,14 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const nomesEx = S.exames.itens.map(e => e.nome);
     const add = (tipo, l, i, acao, chave) => {
       const k = tipo + '|' + Classificar.norm(chave);
-      if (!grupos[k]) { grupos[k] = { tipo, agente: chave, acao, linhas: [], ges: new Set(), exameAtual: l.agente }; out.push(grupos[k]); }
-      grupos[k].linhas.push(i); grupos[k].ges.add(l.ges);
+      if (!grupos[k]) { grupos[k] = { tipo, agente: chave, acao, linhas: [], ges: new Set(), exameAtual: l.agente || (l.sugestao ? '(pendente) sugestão: ' + l.sugestao : '') , sugestao: l.sugestao || '', sugestaoComo: l.sugestaoComo || '' }; out.push(grupos[k]); }
+      grupos[k].linhas.push(i); grupos[k].ges.add(l.ges); if (l.fonte) { grupos[k].fontes = grupos[k].fontes || new Set(); grupos[k].fontes.add(l.fonte); }
     };
     S.linhas.forEach((l, i) => {
       const orig = l.fatorOriginal || l.agente;
       const temManual = l.valorManual !== null && l.valorManual !== undefined && l.valorManual !== '';
       if (l.escopo === 'nao') return;
-      if (l.outros && !l.agente && !temManual) add(l.semIdent ? 'Químico sem identificação ou sem exame na base: validar' : 'OUTROS: agente não especificado no PGR', l, i, 'quimico', orig);
+      if (l.outros && !l.agente && !temManual) add(l.cotacao ? 'Aguardando cotação do laboratório (' + l.cotacao + ')' : l.sugestao ? 'Pendente: sugestão por ' + (l.sugestaoComo || 'aproximação') + ', confirmar' : l.semIdent ? 'Químico sem identificação ou sem exame na base: validar' : 'OUTROS: agente não especificado no PGR', l, i, 'quimico', orig);
       else if (temManual) { /* resolvido com valor manual */ }
       else if (l.tipo === 'Químico (laboratório)' && !nomesEx.includes(l.agente)) add('Químico sem exame na base', l, i, 'quimico', orig);
       else if (l.tipo === 'Químico (laboratório)' && /VERIFICAR/.test(l.obs || '')) add('Químico casado por aproximação', l, i, 'quimico', orig);
@@ -3821,20 +3838,20 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const gesOrd = c => Array.from(c.ges || []).filter(g => g !== '' && g != null).sort((a, b) => numG(a) - numG(b) || String(a).localeCompare(String(b)));
     const ordem = lista.map((c, k) => ({ c, k, g: gesOrd(c) })).sort((a, b) => (a.c.acao === 'info') - (b.c.acao === 'info') || numG(a.g[0]) - numG(b.g[0]) || String(a.c.tipo).localeCompare(String(b.c.tipo)) || String(a.c.agente).localeCompare(String(b.c.agente)));
     let h = `<p>${lista.length} pontos: <b>${nAcao} com ação</b> e ${lista.length - nAcao} só informação. Organizados por GES (do menor para o maior). Clique em <b>Resolver</b> para abrir as opções de cada ponto. O que você resolver fica salvo na base complementar deste navegador e vale para os próximos PGRs.</p>`;
-    h += '<table class="param crit-tab"><tr><th>Item</th><th>GES</th><th>Agente / função (como está no PGR)</th><th>Ocorrência</th><th>Hoje</th><th></th></tr>';
+    h += '<table class="param crit-tab"><tr><th>Item</th><th>GES</th><th>Agente / função (como está no PGR)</th><th>Fonte geradora (PGR)</th><th>Ocorrência</th><th>Hoje</th><th></th></tr>';
     let grupoAtual = null, item = 0;
     ordem.forEach(({ c, k, g }) => {
       const cab = c.acao === 'info' ? 'Só informação' : (g.length ? 'GES ' + g[0] : 'Sem GES');
-      if (cab !== grupoAtual) { grupoAtual = cab; h += `<tr class="sub"><td colspan="6"><b>${esc(cab)}</b></td></tr>`; }
+      if (cab !== grupoAtual) { grupoAtual = cab; h += `<tr class="sub"><td colspan="7"><b>${esc(cab)}</b></td></tr>`; }
       let acao = '';
-      if (c.acao === 'quimico') acao = `<select data-ci="${k}" class="ci-exame">${opts}</select><div class="crit-bot"><button class="mini2" data-ci-sin="${k}">Usar e salvar como sinônimo</button> <button class="mini2" data-ci-qual="${k}">Manter qualitativa</button> <button class="mini2" data-ci-nao="${k}">Não entra</button></div><div class="crit-lin"><small>novo exame na base:</small> <input data-ci-nome="${k}" placeholder="nome do exame" style="width:170px"> <small>R$</small> <input data-ci-valor="${k}" type="number" min="0" step="0.01" style="width:80px"> <button class="mini2" data-ci-novo="${k}">Incluir na base</button></div><div class="crit-lin"><small>ou valor manual só neste orçamento: R$</small> <input data-ci-man="${k}" type="number" min="0" step="0.01" style="width:80px"> <input data-ci-motivo="${k}" placeholder="motivo (obrigatório)" style="width:200px"> <button class="mini2" data-ci-manbtn="${k}">Usar valor manual</button></div>`;
+      if (c.acao === 'quimico') acao += `<select data-ci="${k}" class="ci-exame">${opts}</select><div class="crit-bot"><button class="mini2" data-ci-sin="${k}">Usar este exame</button> <label style="font-size:11px"><input type="checkbox" data-ci-salvar="${k}"> salvar na base para os próximos PGRs</label> <button class="mini2" data-ci-qual="${k}">Manter qualitativa</button> <button class="mini2" data-ci-nao="${k}">Não entra</button></div><div class="crit-lin"><small>novo exame na base:</small> <input data-ci-nome="${k}" placeholder="nome do exame" style="width:170px"> <small>R$</small> <input data-ci-valor="${k}" type="number" min="0" step="0.01" style="width:80px"> <button class="mini2" data-ci-novo="${k}">Incluir na base</button></div><div class="crit-lin"><small>ou valor manual só neste orçamento: R$</small> <input data-ci-man="${k}" type="number" min="0" step="0.01" style="width:80px"> <input data-ci-motivo="${k}" placeholder="motivo (obrigatório)" style="width:200px"> <button class="mini2" data-ci-manbtn="${k}">Usar valor manual</button></div>`;
       else if (c.acao === 'fisico') acao = `<select data-ci-tipo="${k}"><option value="">manter como está</option>${TIPOS.filter(t => t !== 'Periculosidade (por cargo)').map(t => `<option>${t}</option>`).join('')}</select> <button class="mini2" data-ci-fis="${k}">Aplicar</button>`;
       if (c.acao !== 'info') acao += `<div class="crit-lin"><small>Parecer se ficar pendente (vai no relatório):</small><textarea data-ci-par="${k}" style="min-height:56px;font-size:11px">${esc(S.pareceres[Ocorrencias.chavePonto(c)] || Ocorrencias.parecerPadrao(c))}</textarea></div>`;
       const outros = g.slice(1), gesTxt = `<b>${esc(g[0] ?? '')}</b>` + (outros.length ? `<div class="crit-ges"><small>também: ${esc(outros.slice(0, 12).join(', '))}${outros.length > 12 ? ' e mais ' + (outros.length - 12) : ''}</small></div>` : '');
-      const hoje = c.acao === 'quimico' ? esc(c.exameAtual || '(qualitativa)') : c.acao === 'fisico' ? 'avaliação a definir' : '';
+      const hoje = c.acao === 'quimico' ? esc(c.exameAtual || (/qualitativa/i.test(c.tipo) ? '(qualitativa)' : '(pendente: sem exame, fora do preço)')) : c.acao === 'fisico' ? 'avaliação a definir' : '';
       const info = c.acao === 'info' ? (c.itens ? `<details><summary><small>ver lista</small></summary><small style="white-space:pre-wrap">${esc(c.msg)}</small></details>` : `<small>${esc(c.msg || '')}</small>`) : '';
-      h += `<tr><td>${++item}</td><td>${gesTxt}</td><td><b>${esc(c.agente || '')}</b>${info}</td><td><span class="tag ver">${esc(c.tipo)}</span></td><td><small>${hoje}</small></td><td>${c.acao !== 'info' ? `<button type="button" class="crit-tog" data-crit-tog="${k}">Resolver</button>` : ''}</td></tr>`;
-      if (c.acao !== 'info') h += `<tr class="crit-acoes" data-crit-acoes="${k}" hidden><td></td><td colspan="5">${acao}</td></tr>`;
+      h += `<tr><td>${++item}</td><td>${gesTxt}</td><td><b>${esc(c.agente || '')}</b>${info}</td><td><small>${esc(c.fontes ? Array.from(c.fontes).slice(0, 4).join(' | ') + (c.fontes.size > 4 ? ' | ...' : '') : '')}</small></td><td><span class="tag ver">${esc(c.tipo)}</span></td><td><small>${hoje}</small></td><td>${c.acao !== 'info' ? `<button type="button" class="crit-tog" data-crit-tog="${k}">Resolver</button>` : ''}</td></tr>`;
+      if (c.acao !== 'info') h += `<tr class="crit-acoes" data-crit-acoes="${k}" hidden><td></td><td colspan="6">${acao}</td></tr>`;
     });
     h += '</table>';
     const el = $('#crit-lista'); el.innerHTML = h;
@@ -3844,10 +3861,10 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const reg = (k, acao, detalhe) => { const c = lista[k]; const ges = Array.from(c.ges || []); Ocorrencias.registrar(S, { origem: 'Ponto crítico', ocorrencia: c.tipo, agente: c.agente, ges: ges.length > 6 ? ges.length + ' GES' : ges.join(', '), acao, detalhe: (detalhe ? detalhe.replace(/\.?\s*$/, '. ') : '') + c.linhas.length + ' linha(s)' }); delete S.pareceres[Ocorrencias.chavePonto(c)]; };
     el.querySelectorAll('[data-ci-sin]').forEach(b => b.addEventListener('click', () => {
       const k = Number(b.dataset.ciSin); const ex = el.querySelector(`select[data-ci="${k}"]`).value; if (!ex) return;
-      const chaveSin = Classificar.norm(lista[k].agente);
-      if (chaveSin !== 'outros') { S.extras.sinonimos[chaveSin] = ex; salvarExtras(); }
-      reg(k, 'Associado ao exame da tabela: ' + ex, chaveSin !== 'outros' ? 'salvo como sinônimo na base complementar' : 'só neste orçamento');
-      for (const l of linhasDe(k)) { l.tipo = 'Químico (laboratório)'; l.agente = ex; l.verificar = false; l.outros = false; l.obs = (l.fatorOriginal || '') + ' | exame definido pelo usuário' + (chaveSin === 'outros' ? ' (só neste orçamento)' : ''); }
+      const chaveSin = Classificar.norm(lista[k].agente); const salvar = chaveSin !== 'outros' && !!(el.querySelector(`[data-ci-salvar="${k}"]`) || {}).checked;
+      if (salvar) { S.extras.sinonimos[chaveSin] = ex; salvarExtras(); }
+      reg(k, 'Associado ao exame da tabela: ' + ex, salvar ? 'salvo na base complementar (vale para os próximos PGRs)' : 'só neste orçamento');
+      for (const l of linhasDe(k)) { l.tipo = 'Químico (laboratório)'; l.agente = ex; l.verificar = false; l.outros = false; l.semIdent = false; delete l.sugestao; l.obs = (l.fatorOriginal || '') + ' | exame definido pelo usuário' + (salvar ? '' : ' (só neste orçamento)'); }
       renderCriticos(); renderLevantamento();
     }));
     el.querySelectorAll('[data-ci-manbtn]').forEach(b => b.addEventListener('click', () => {
@@ -4044,6 +4061,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
 
   // ------------------------------------------------------------------ passo 3: escopo
   function renderEscopo() {
+    { const c = $('#chk-semcolab-prop2'); if (c) { c.checked = !!S.semColab.proposta; $('#esc-nsc').textContent = gesSemColab().length; } }
     { sincronizarTipoLP(); const tp = tiposDe(S.logistica.tipoLaudo); $$('#log-tipo input').forEach(c => { c.checked = !!tp[c.value]; }); renderLpAviso(); }
     $('#chk-mineracao').checked = !!S.mineracao;
     $('#mineracao-info').innerHTML = S.mineracao ? `Ativo: poeira mineral e sílica com <b>${S.regras.valores.nr22_medicoes_poeira.valor} medições por GES</b> (NR-22 Anexo V, item 4.2). ${/^0[5-9]/.test(String(S.cadastro.cnae || '').replace(/\D/g, '').slice(0, 2)) ? 'Sugerido pelo CNAE ' + S.cadastro.cnae + '.' : ''}` : 'Desligado: poeira e sílica seguem a regra geral (1 amostrador por GES).';
@@ -4057,6 +4075,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     else $('#escopo-proposta').textContent = 'Sem proposta lida. O plano escolhido acima define o que já está ' + (S.modulo === 'esboco' ? 'contratado.' : 'coberto.');
   }
   function ligarEscopo() {
+    $('#chk-semcolab-prop2').addEventListener('change', () => { S.semColab.proposta = $('#chk-semcolab-prop2').checked; Ocorrencias.registrar(S, { origem: 'Escopo', acao: (S.semColab.proposta ? 'GES sem colaborador incluídos na proposta' : 'GES sem colaborador retirados da proposta') + ' (' + gesSemColab().length + ' GES)' }); renderEscopo(); });
     $('#chk-mineracao').addEventListener('change', () => { S.mineracao = $('#chk-mineracao').checked; renderEscopo(); });
     $('#sel-plano').addEventListener('change', () => { S.plano = $('#sel-plano').value; renderEscopo(); });
     $('#btn-aplicar-plano').addEventListener('click', () => { S.linhas.forEach(l => delete l.escopoManual); Motor.aplicarPlano(S.linhas, S.regras, S.plano); renderEscopo(); });
@@ -4133,8 +4152,19 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
   }
 
   // ------------------------------------------------------------------ passo 5: resultado
+  const semColabLinha = l => (l.expostos === 0 || l.expostos === '0' || l.expostos === '') && l.tipo !== 'Ausência de risco';
+  const gesSemColab = () => Array.from(new Set(S.linhas.filter(semColabLinha).map(l => String(l.ges))));
+  /* GES com 0 colaboradores: a regra de quantidade dá 0 avaliações. Com a opção ligada, a quantidade é calculada como se houvesse 1 colaborador. */
+  function linhasComSemColab(incluir) {
+    if (!incluir) return S.linhas;
+    return S.linhas.map(l => semColabLinha(l) && l.escopo !== 'nao' && (l.qtdAjustada === null || l.qtdAjustada === undefined || l.qtdAjustada === '') ? Object.assign({}, l, { qtdAjustada: Motor.qtdSugerida(Object.assign({}, l, { expostos: 1 }), S.regras, { mineracao: S.mineracao }), semColabForcado: true }) : l);
+  }
+  function calcularEsboco() {
+    const ent = { linhas: linhasComSemColab(S.semColab.esboco), logistica: S.logistica, regras: S.regras, exames: S.exames, vigencia: S.logistica.vigencia, mineracao: S.mineracao, descontoPct: S.descontoPct, gruposExcluidos: S.gruposExcluidos };
+    return Motor.calcular(ent, 'total');
+  }
   function calcular() {
-    const ent = { linhas: S.linhas, logistica: S.logistica, regras: S.regras, exames: S.exames, vigencia: S.logistica.vigencia, mineracao: S.mineracao, descontoPct: S.descontoPct, gruposExcluidos: S.gruposExcluidos };
+    const ent = { linhas: linhasComSemColab(S.semColab.proposta), logistica: S.logistica, regras: S.regras, exames: S.exames, vigencia: S.logistica.vigencia, mineracao: S.mineracao, descontoPct: S.descontoPct, gruposExcluidos: S.gruposExcluidos };
     S.resultado = Motor.calcular(ent, 'adicional');
     S.resultadoTotal = Motor.calcular(ent, 'total');
   }
@@ -4222,11 +4252,11 @@ Responsável: ${S.logistica.responsavel || ''}    Data: ${(S.logistica.data || '
   // ------------------------------------------------------------------ saídas
   function nomeBase() { return 'Precificação - ' + (S.cadastro.empresa || 'empresa').replace(/[\\/:*?"<>|]/g, '').slice(0, 60).trim(); }
   function estadoJSON() {
-    return { app: 'Precifica-Fieg', versao: 1, salvoEm: new Date().toISOString(), regrasVersao: S.regras.versao, tabelaExames: S.exames.fonte, vigenciaUsada: S.logistica.vigencia, regrasUsadas: S.regras, cadastro: S.cadastro, plano: S.plano, incluirLP: S.incluirLP, lpSelecao: S.lpSelecao, mineracao: S.mineracao, descontoPct: S.descontoPct, esbocoFiltro: S.esbocoFiltro, unidade: S.unidade, extras: S.extras, logistica: S.logistica, ergo: S.ergo, total: S.total, gruposExcluidos: S.gruposExcluidos, historico: S.historico, pareceres: S.pareceres, motivos: S.motivos, ppr: S.ppr, linhas: S.linhas.map(l => ({ ges: l.ges, nome: l.nome, expostos: l.expostos, tipo: l.tipo, agente: l.agente, qtdAjustada: l.qtdAjustada, valorManual: l.valorManual ?? null, motivoManual: l.motivoManual || null, ionizante: !!l.ionizante, outros: !!l.outros, unidadeCargo: !!l.unidadeCargo, manual: !!l.manual, lpPosterior: !!l.lpPosterior, motivoEscopo: l.motivoEscopo || null, fatorOriginal: l.fatorOriginal, grupo: l.grupo, escopo: l.escopo, escopoManual: !!l.escopoManual, obs: l.obs, verificar: !!l.verificar, fisico: !!l.fisico })), proposta: S.proposta, resultado: S.resultado ? S.resultado.custos : null, pgrResumo: S.pgr ? { cadastro: S.pgr.cadastro, ges: S.pgr.ges, porCargo: S.pgr.porCargo || null, layout: S.pgr.layout, criticos: S.pgr.criticos || [] } : null };
+    return { app: 'Precifica-Fieg', versao: 1, salvoEm: new Date().toISOString(), regrasVersao: S.regras.versao, tabelaExames: S.exames.fonte, vigenciaUsada: S.logistica.vigencia, regrasUsadas: S.regras, cadastro: S.cadastro, plano: S.plano, incluirLP: S.incluirLP, lpSelecao: S.lpSelecao, mineracao: S.mineracao, semColab: S.semColab, descontoPct: S.descontoPct, esbocoFiltro: S.esbocoFiltro, unidade: S.unidade, extras: S.extras, logistica: S.logistica, ergo: S.ergo, total: S.total, gruposExcluidos: S.gruposExcluidos, historico: S.historico, pareceres: S.pareceres, motivos: S.motivos, ppr: S.ppr, linhas: S.linhas.map(l => ({ ges: l.ges, nome: l.nome, expostos: l.expostos, tipo: l.tipo, agente: l.agente, qtdAjustada: l.qtdAjustada, valorManual: l.valorManual ?? null, motivoManual: l.motivoManual || null, ionizante: !!l.ionizante, outros: !!l.outros, unidadeCargo: !!l.unidadeCargo, manual: !!l.manual, lpPosterior: !!l.lpPosterior, motivoEscopo: l.motivoEscopo || null, fatorOriginal: l.fatorOriginal, grupo: l.grupo, escopo: l.escopo, escopoManual: !!l.escopoManual, obs: l.obs, verificar: !!l.verificar, fisico: !!l.fisico })), proposta: S.proposta, resultado: S.resultado ? S.resultado.custos : null, pgrResumo: S.pgr ? { cadastro: S.pgr.cadastro, ges: S.pgr.ges, porCargo: S.pgr.porCargo || null, layout: S.pgr.layout, criticos: S.pgr.criticos || [] } : null };
   }
   function carregarJSON(j) {
     if (!j || j.app !== 'Precifica-Fieg') { alert('Arquivo não é um orçamento do Precifica-Fieg.'); return; }
-    Object.assign(S.cadastro, j.cadastro || {}); S.plano = j.plano || S.plano; S.incluirLP = !!j.incluirLP; S.lpSelecao = j.lpSelecao || null; S.mineracao = !!j.mineracao; S.descontoPct = j.descontoPct ?? null; S.esbocoFiltro = j.esbocoFiltro || 'tudo'; S.unidade = j.unidade || 'ges'; if (j.extras) { S.extras = { sinonimos: Object.assign({}, S.extras.sinonimos, j.extras.sinonimos || {}), exames: S.extras.exames.concat((j.extras.exames || []).filter(e => !S.extras.exames.some(x => x.nome === e.nome))) }; aplicarExtrasExames(); }
+    Object.assign(S.cadastro, j.cadastro || {}); S.plano = j.plano || S.plano; S.incluirLP = !!j.incluirLP; S.lpSelecao = j.lpSelecao || null; S.mineracao = !!j.mineracao; S.semColab = Object.assign({ esboco: false, proposta: false }, j.semColab || {}); S.descontoPct = j.descontoPct ?? null; S.esbocoFiltro = j.esbocoFiltro || 'tudo'; S.unidade = j.unidade || 'ges'; if (j.extras) { S.extras = { sinonimos: Object.assign({}, S.extras.sinonimos, j.extras.sinonimos || {}), exames: S.extras.exames.concat((j.extras.exames || []).filter(e => !S.extras.exames.some(x => x.nome === e.nome))) }; aplicarExtrasExames(); }
     Object.assign(S.logistica, j.logistica || {}); S.linhas = j.linhas || []; S.proposta = j.proposta || null;
     S.historico = j.historico || []; if (j.ergo) S.ergo = j.ergo; if (j.total) S.total = j.total; S.gruposExcluidos = j.gruposExcluidos || []; S.pareceres = j.pareceres || {}; S.motivos = j.motivos || {}; if (j.ppr) S.ppr = j.ppr;
     S.pgr = j.pgrResumo ? { cadastro: j.pgrResumo.cadastro, ges: j.pgrResumo.ges, porCargo: j.pgrResumo.porCargo || null, avisos: [], layout: j.pgrResumo.layout, criticos: j.pgrResumo.criticos || [] } : null;
@@ -4308,9 +4338,9 @@ Responsável: ${S.logistica.responsavel || ''}    Data: ${(S.logistica.data || '
     $('#btn-ocorr-baixar').addEventListener('click', () => baixar(new Blob([relatorioOcorrenciasHTML()], { type: 'text/html' }), nomeRelOcorr()));
     $('#btn-ocorr-ver').addEventListener('click', () => { const w = window.open('', '_blank'); if (w) { w.document.write(relatorioOcorrenciasHTML()); w.document.close(); setTimeout(() => w.print(), 400); } });
     $('#btn-desc-limpar').addEventListener('click', () => { S.descontoPct = null; renderResultado(); });
-    $('#btn-excel').addEventListener('click', async () => { try { baixar(await gerarExcelBlob(), nomeBase() + '.xlsx'); } catch (e) { alert('Erro ao gerar Excel: ' + e.message); } });
+    $('#btn-excel').addEventListener('click', async () => { if (!confirmarPendencias('baixar o Excel')) return; try { baixar(await gerarExcelBlob(), nomeBase() + '.xlsx'); } catch (e) { alert('Erro ao gerar Excel: ' + e.message); } });
     $('#btn-json').addEventListener('click', () => baixar(new Blob([JSON.stringify(estadoJSON(), null, 1)], { type: 'application/json' }), nomeBase() + '.json'));
-    $('#btn-print').addEventListener('click', imprimirResultado);
+    $('#btn-print').addEventListener('click', () => { if (confirmarPendencias('imprimir a proposta')) imprimirResultado(); });
     $('#print-email').addEventListener('change', () => document.body.classList.toggle('print-sem-email', !$('#print-email').checked));
     $('#texto-proposta').addEventListener('input', () => { $('#texto-proposta-print').textContent = $('#texto-proposta').value; });
     $('#btn-copiar').addEventListener('click', () => { navigator.clipboard.writeText($('#texto-proposta').value); $('#btn-copiar').textContent = 'Copiado'; setTimeout(() => $('#btn-copiar').textContent = 'Copiar texto', 1500); });
@@ -4350,6 +4380,26 @@ table.custos th{background:#eef2f7;font-size:10.5px}table.custos td{font-size:10
     if ($('#print-email').checked) h += `<h2>Proposta ao cliente (texto para o FO-021 / e-mail)</h2><div class="prop">${esc($('#texto-proposta').value)}</div>`;
     h += `<div class="ass">_______________________________________<br><b>${esc(L.responsavel || 'Responsável pela precificação')}</b><br>Central de SST SESI Goiás</div>`;
     return h + `<p><small>Gerado em ${new Date().toLocaleString('pt-BR')} pelo Precifica-Fieg.</small></p></body></html>`;
+  }
+  /* pendências que impedem um laudo/proposta completo: químicos sem exame nem valor, VERIFICAR, cotações em aberto */
+  function pendenciasImpressao() {
+    const out = [];
+    const temManual = l => l.valorManual !== null && l.valorManual !== undefined && l.valorManual !== '';
+    S.linhas.forEach(l => {
+      if (l.escopo === 'nao') return;
+      const nome = (l.fatorOriginal || l.agente || l.tipo);
+      if (l.cotacao) out.push({ ges: l.ges, txt: nome + ': aguardando cotação do laboratório (sem valor)' });
+      else if (l.outros && !l.agente && !temManual(l)) out.push({ ges: l.ges, txt: nome + ': sem exame nem valor' + (l.sugestao ? ' (sugestão não confirmada: ' + l.sugestao + ')' : '') });
+      else if (l.verificar) out.push({ ges: l.ges, txt: nome + ': marcado VERIFICAR' });
+    });
+    return out;
+  }
+  function confirmarPendencias(acao) {
+    const pend = pendenciasImpressao(); if (!pend.length) return true;
+    const porGes = {}; pend.forEach(p => { (porGes[p.ges] = porGes[p.ges] || []).push(p.txt); });
+    const ges = Object.keys(porGes).sort((a, b) => (Number(a) || 0) - (Number(b) || 0));
+    const lista = ges.slice(0, 12).map(g => 'GES ' + g + ': ' + Array.from(new Set(porGes[g])).join('; ')).join('\n') + (ges.length > 12 ? '\n... e mais ' + (ges.length - 12) + ' GES' : '');
+    return confirm('ATENÇÃO: há ' + pend.length + ' pendência(s) não resolvida(s) em ' + ges.length + ' GES. Elas saem sem exame ou sem valor no documento.\n\n' + lista + '\n\nResolva nos pontos críticos antes de ' + acao + '. Quer ' + acao + ' mesmo assim?');
   }
   function imprimirResultado() {
     const html = resultadoHTML();
@@ -4429,17 +4479,33 @@ table.custos th{background:#eef2f7;font-size:10.5px}table.custos td{font-size:10
     }
     h += '</table><h4>Base complementar (incluída por você)</h4>';
     h += `<p><small>${Object.keys(S.extras.sinonimos).length} sinônimos e ${S.extras.exames.length} exames novos.</small></p>`;
-    if (Object.keys(S.extras.sinonimos).length) h += '<table class="param"><tr><th>Nome no PGR</th><th>Exame da base</th><th></th></tr>' + Object.entries(S.extras.sinonimos).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td><td><button class="mini" data-del-sin="${esc(k)}">x</button></td></tr>`).join('') + '</table>';
+    if (Object.keys(S.extras.sinonimos).length) h += '<p><small>Cada linha abaixo é uma decisão sua (sinônimo salvo ou proposta aceita). Remova o que aceitou por engano: o agente volta a aparecer nos pontos críticos.</small></p><table class="param"><tr><th>Item</th><th>Nome no PGR</th><th>Exame da base</th><th></th></tr>' + Object.entries(S.extras.sinonimos).map(([k, v], i) => `<tr><td>${i + 1}</td><td>${esc(k)}</td><td>${esc(v)}</td><td><button class="mini" data-del-sin="${esc(k)}" title="Remover esta decisão">x</button></td></tr>`).join('') + '</table>' + `<div class="crit-bot"><button class="sec" id="btn-sin-limpar">Remover todas as decisões salvas</button>${S.pgr ? ' <button class="sec" id="btn-sin-reaplicar" title="Monta o levantamento de novo a partir do PGR aberto, sem as decisões removidas">Reaplicar ao PGR aberto</button>' : ''}</div>`;
     if (S.extras.exames.length) h += '<table class="param"><tr><th>Exame novo</th><th>Valor (R$)</th><th></th></tr>' + S.extras.exames.map((e, i) => `<tr><td>${esc(e.nome)}</td><td>${fmt(e.valor)}</td><td><button class="mini" data-del-ex="${i}">x</button></td></tr>`).join('') + '</table>';
     h += '<h4>Pendências de definição</h4><ol>' + (S.regras.pendentes_resumo || []).map(x => `<li>${x}</li>`).join('') + '</ol>';
     el.innerHTML = h;
     el.querySelectorAll('[data-param]').forEach(i => i.addEventListener('change', () => { const p = S.regras.valores[i.dataset.param]; p.valor = p.formato === 'pct' ? Number(i.value) / 100 : Number(i.value); salvarRegrasLocal(); }));
     el.querySelectorAll('[data-tipo]').forEach(i => i.addEventListener('change', () => { S.regras.tipos[i.dataset.tipo][i.dataset.c] = Number(i.value); salvarRegrasLocal(); }));
     el.querySelectorAll('[data-del-sin]').forEach(b => b.addEventListener('click', () => { delete S.extras.sinonimos[b.dataset.delSin]; salvarExtras(); renderParametros(); }));
+    const bsl = $('#btn-sin-limpar'); if (bsl) bsl.addEventListener('click', () => { if (!confirm('Remover todas as decisões salvas (sinônimos e propostas aceitas)? Os agentes voltam a aparecer nos pontos críticos.')) return; const n = Object.keys(S.extras.sinonimos).length; S.extras.sinonimos = {}; salvarExtras(); Ocorrencias.registrar(S, { origem: 'Parâmetros', acao: 'Base complementar: ' + n + ' decisão(ões) removida(s)' }); renderParametros(); });
+    const bsr = $('#btn-sin-reaplicar'); if (bsr) bsr.addEventListener('click', () => { if (!S.pgr) return; if (!confirm('Montar o levantamento de novo a partir do PGR aberto? Ajustes manuais nas linhas (quantidades, valores manuais, escopo) serão perdidos.')) return; aplicarPgr(); renderLevantamento(); $('#painel-param').classList.remove('aberto'); });
     el.querySelectorAll('[data-del-ex]').forEach(b => b.addEventListener('click', () => { const e = S.extras.exames.splice(Number(b.dataset.delEx), 1)[0]; S.exames.itens = S.exames.itens.filter(x => !(x.extra && x.nome === e.nome)); salvarExtras(); renderParametros(); }));
   }
   function salvarRegrasLocal() { try { localStorage.setItem('precifica.regras', JSON.stringify(S.regras)); $('#aviso-regras-locais').hidden = false; } catch (_) { /* ignora */ } }
+  function ligarRedimensionarPaineis() {
+    document.querySelectorAll('aside.painel').forEach(p => {
+      try { const w = localStorage.getItem('precifica.painel.' + p.id); if (w) p.style.width = w + 'px'; } catch (_) { /* ignora */ }
+      const h = document.createElement('div'); h.className = 'painel-alca'; h.title = 'Arraste para alargar ou estreitar'; p.appendChild(h);
+      h.addEventListener('mousedown', e => {
+        e.preventDefault(); p.style.transition = 'none'; document.body.style.userSelect = 'none';
+        const mover = ev => { const w = Math.max(360, Math.min(window.innerWidth - 40, window.innerWidth - ev.clientX)); p.style.width = w + 'px'; };
+        const soltar = () => { document.removeEventListener('mousemove', mover); document.removeEventListener('mouseup', soltar); p.style.transition = ''; document.body.style.userSelect = ''; try { localStorage.setItem('precifica.painel.' + p.id, parseInt(p.style.width, 10)); } catch (_) { /* ignora */ } };
+        document.addEventListener('mousemove', mover); document.addEventListener('mouseup', soltar);
+      });
+      h.addEventListener('dblclick', () => { p.style.width = ''; try { localStorage.removeItem('precifica.painel.' + p.id); } catch (_) { /* ignora */ } });
+    });
+  }
   function ligarParametros() {
+    ligarRedimensionarPaineis();
     $('#btn-param').addEventListener('click', () => { renderParametros(); relUI.renderConfig($('#param-equipe')); $('#painel-param').classList.add('aberto'); });
     $('#btn-fechar-param').addEventListener('click', () => { $('#painel-param').classList.remove('aberto'); if (S.passo === 5) renderResultado(); });
     $('#btn-param-xlsx').addEventListener('click', async () => { try { baixar(await ParametrosXLSX.exportar(S.regras, S.exames, PPR, Ergonomia), 'Parâmetros Precifica - regras ' + (S.regras.versao || '') + '.xlsx'); } catch (e) { alert('Erro ao gerar a planilha: ' + e.message); } });
@@ -4498,8 +4564,9 @@ table.custos th{background:#eef2f7;font-size:10.5px}table.custos td{font-size:10
   function renderEsboco() {
     calcular(); renderRegraRuido();
     Object.entries(T_().filtro).forEach(([k, t]) => { const o = $(`#esb-filtro option[value="${k}"]`); if (o) o.textContent = t; });
-    const R = S.resultadoTotal; const f = S.esbocoFiltro;
+    const R = calcularEsboco(); const f = S.esbocoFiltro;
     $('#esb-filtro').value = f;
+    $('#chk-semcolab-esb2').checked = !!S.semColab.esboco; $('#esb-nsc').textContent = gesSemColab().length;
     const incl = l => l.tipo !== 'Ausência de risco' && l.tipo !== 'Periculosidade (por cargo)' && l.escopo !== 'nao' && l.qtd > 0 && (f === 'tudo' || (f === 'plano' && l.escopo === 'plano') || (f === 'adicional' && l.escopo === 'cobrar'));
     const linhas = R.linhas.filter(incl);
     const naoContratadas = R.linhas.filter(l => l.tipo !== 'Ausência de risco' && l.tipo !== 'Periculosidade (por cargo)' && l.escopo === 'nao');
@@ -4511,7 +4578,9 @@ table.custos th{background:#eef2f7;font-size:10.5px}table.custos td{font-size:10
     // resumo: uma linha por risco, GES em ordem crescente separados por " - "
     h += `<h4 class="esb-t">${esc(tituloResumo(f))}</h4><table class="custos"><thead><tr><th>Item</th><th>Risco</th><th>GES</th><th>QTD</th><th>Realizada</th><th>Observação</th></tr></thead><tbody>`;
     resumoPorCategoria(linhas).forEach((r, i) => { h += `<tr><td>${i + 1}</td><td>${esc(r.risco)}</td><td>${esc(r.ges.join('\u00a0- '))}</td><td class="num">${pad(r.qtd)}</td><td></td><td></td></tr>`; });
-    h += `<tr class="tot"><td></td><td>Total de medições</td><td>${new Set(linhas.map(l => l.ges)).size} GES</td><td class="num">${pad(linhas.reduce((s, l) => s + l.qtd, 0))}</td><td></td><td></td></tr></tbody></table>`;
+    h += `<tr class="tot"><td></td><td>Total de medições</td><td>${new Set(linhas.map(l => l.ges)).size} GES</td><td class="num">${pad(linhas.reduce((s, l) => s + l.qtd, 0))}</td><td></td><td></td></tr>`;
+    { const gsc = gesSemColab().filter(g => !linhas.some(l => String(l.ges) === g)).sort((a, b) => (Number(a) || 0) - (Number(b) || 0)); if (gsc.length) h += `<tr><td></td><td>GES sem colaborador (sem medição)</td><td>${esc(gsc.join('\u00a0- '))}</td><td class="num">${gsc.length} GES</td><td></td><td>0 colaboradores no PGR</td></tr>`; }
+    h += '</tbody></table>';
     h += '<h4 class="esb-t">Relação analítica de medições por GES</h4>';
     const gesOrd = Array.from(new Set(R.linhas.filter(l => !(l.tipo === T_LP && (l.ges === '' || l.ges == null))).map(chaveUnidade))).sort((x, y) => (Number(String(x).split('|')[0]) || 0) - (Number(String(y).split('|')[0]) || 0));
     for (const gk of gesOrd) {
@@ -4536,7 +4605,7 @@ table.custos th{background:#eef2f7;font-size:10.5px}table.custos td{font-size:10
   // documento de impressão do esboço no layout do esboço da Central (Arial, resumo por risco e relação analítica por GES)
   function esbocoDocHTML(opcao) {
     calcular();
-    const R = S.resultadoTotal, f = S.esbocoFiltro, c = S.cadastro, pad = n => String(n).padStart(2, '0');
+    const R = calcularEsboco(), f = S.esbocoFiltro, c = S.cadastro, pad = n => String(n).padStart(2, '0');
     const excl = l => l.tipo === 'Ausência de risco' || l.tipo === 'Periculosidade (por cargo)';
     const incl = l => !excl(l) && l.escopo !== 'nao' && l.qtd > 0 && (f === 'tudo' || (f === 'plano' && l.escopo === 'plano') || (f === 'adicional' && l.escopo === 'cobrar'));
     const rot = l => l.tipo === 'Químico (laboratório)' ? (l.agente || (String(l.fatorOriginal || 'Químico').replace(/\s*\(.*$/, '') + ' (exame a definir)')) : l.tipo === 'Avaliação qualitativa' ? l.agente + ' (qualitativa)' : l.tipo === 'Ruído (dosimetria)' ? 'Ruído' : l.tipo === 'Calor (IBUTG)' ? 'Calor (IBUTG)' : l.tipo === 'Vibração corpo inteiro' ? 'Vibração VCI' : l.tipo === 'Vibração mãos e braços' ? 'Vibração VMB' : l.tipo;
@@ -4559,7 +4628,9 @@ tr.tot td{font-weight:bold;background:#f2f2f2}.topico{break-inside:avoid;page-br
     if (opcao !== 'analitico') {
       h += `<div class="topico"><h2>${esc(tituloResumo(f))}</h2><table><thead><tr><th style="width:5%">Item</th><th style="width:20%">Risco</th><th style="width:32%">GES</th><th style="width:7%">QTD</th><th style="width:11%">Realizada</th><th>Observação</th></tr></thead><tbody>`;
       resumo.forEach((r, i) => { h += `<tr><td class="n">${i + 1}</td><td>${esc(r.risco)}</td><td>${esc(r.ges.join('\u00a0- '))}</td><td class="n">${pad(r.qtd)}</td><td></td><td></td></tr>`; });
-      h += `<tr class="tot"><td></td><td>Total</td><td>${new Set(linhas.map(l => l.ges)).size} GES</td><td class="n">${pad(total)}</td><td></td><td></td></tr></tbody></table></div>`;
+      h += `<tr class="tot"><td></td><td>Total</td><td>${new Set(linhas.map(l => l.ges)).size} GES</td><td class="n">${pad(total)}</td><td></td><td></td></tr>`;
+      { const gsc = gesSemColab().filter(g => !linhas.some(l => String(l.ges) === g)).sort((a, b) => (Number(a) || 0) - (Number(b) || 0)); if (gsc.length) h += `<tr><td></td><td>GES sem colaborador (sem medição)</td><td>${esc(gsc.join('\u00a0- '))}</td><td class="n">${gsc.length} GES</td><td></td><td>0 colaboradores no PGR</td></tr>`; }
+      h += '</tbody></table></div>';
     }
     const ausentes = [], gesOrd = Array.from(new Set(R.linhas.filter(l => !(l.tipo === T_LP && (l.ges === '' || l.ges == null))).map(chaveUnidade))).sort((x, y) => (Number(String(x).split('|')[0]) || 0) - (Number(String(y).split('|')[0]) || 0));
     let analit = '';
@@ -4598,14 +4669,15 @@ tr.tot td{font-weight:bold;background:#f2f2f2}.topico{break-inside:avoid;page-br
   }
   function ligarEsboco() {
     $('#esb-filtro').addEventListener('change', () => { S.esbocoFiltro = $('#esb-filtro').value; renderEsboco(); });
-    $('#btn-esb-copiar').addEventListener('click', () => { navigator.clipboard.writeText(textoEsboco()).then(() => { $('#btn-esb-copiar').textContent = 'Copiado'; setTimeout(() => $('#btn-esb-copiar').textContent = 'Copiar texto', 1500); }).catch(() => {}); });
-    $('#btn-esb-print').addEventListener('click', imprimirEsboco);
-    $('#btn-esb-baixar').addEventListener('click', () => baixar(new Blob([esbocoDocHTML($('#esb-print-opcao').value)], { type: 'text/html' }), 'Esboço - ' + (S.cadastro.empresa || 'empresa').replace(/[\\/:*?"<>|]/g, '').slice(0, 60) + '.html'));
+    $('#chk-semcolab-esb2').addEventListener('change', () => { S.semColab.esboco = $('#chk-semcolab-esb2').checked; Ocorrencias.registrar(S, { origem: 'Esboço', acao: (S.semColab.esboco ? 'GES sem colaborador incluídos no esboço' : 'GES sem colaborador retirados do esboço') + ' (' + gesSemColab().length + ' GES)' }); renderEsboco(); });
+    $('#btn-esb-copiar').addEventListener('click', () => { if (!confirmarPendencias('copiar o esboço')) return; navigator.clipboard.writeText(textoEsboco()).then(() => { $('#btn-esb-copiar').textContent = 'Copiado'; setTimeout(() => $('#btn-esb-copiar').textContent = 'Copiar texto', 1500); }).catch(() => {}); });
+    $('#btn-esb-print').addEventListener('click', () => { if (confirmarPendencias('imprimir o esboço')) imprimirEsboco(); });
+    $('#btn-esb-baixar').addEventListener('click', () => { if (!confirmarPendencias('baixar o esboço')) return; baixar(new Blob([esbocoDocHTML($('#esb-print-opcao').value)], { type: 'text/html' }), 'Esboço - ' + (S.cadastro.empresa || 'empresa').replace(/[\\/:*?"<>|]/g, '').slice(0, 60) + '.html'); });
   }
 
   // ------------------------------------------------------------------ botão Limpar: zera os dados do módulo aberto (parâmetros não mudam)
   function resetLevantamentoEstado() {
-    Object.assign(S, { pgr: null, proposta: null, linhas: [], plano: 'Sem plano / avulso', incluirLP: false, lpSelecao: null, mineracao: false, descontoPct: null, esbocoFiltro: 'tudo', unidade: 'ges', resultado: null, resultadoTotal: null, arquivos: { pgr: null, proposta: null }, historico: [], pareceres: {}, motivos: {}, gruposExcluidos: [], filtroLev: { texto: '', tipo: '' }, demo: null });
+    Object.assign(S, { pgr: null, proposta: null, linhas: [], plano: 'Sem plano / avulso', incluirLP: false, lpSelecao: null, mineracao: false, descontoPct: null, esbocoFiltro: 'tudo', unidade: 'ges', semColab: { esboco: false, proposta: false }, resultado: null, resultadoTotal: null, arquivos: { pgr: null, proposta: null }, historico: [], pareceres: {}, motivos: {}, gruposExcluidos: [], filtroLev: { texto: '', tipo: '' }, demo: null });
     for (const k of Object.keys(S.cadastro)) S.cadastro[k] = '';
     S.logistica = { distancia: 0, pernoite: false, modo: 'auto', diasAjustado: null, postagensAjustado: null, responsavel: '', tipoLaudo: 'LTCAT/LI', data: hoje(), vigencia: vigenciaAtual() };
     S.registroAtual = null;
