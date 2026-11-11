@@ -339,9 +339,6 @@
           <button class="sec" id="btn-tudo-cobrar">Cobrar tudo (sem plano)</button>
         </div>
         <small id="escopo-ajuda">Aplicar o plano marca como "coberto" o que o pacote já inclui. Depois você pode mudar linha a linha no passo 2 (coluna Escopo).</small>
-        <h3>GES sem colaborador</h3>
-        <label style="font-size:14px"><input type="checkbox" id="chk-semcolab-prop2"> Incluir GES sem colaborador na proposta (<span id="esc-nsc">0</span> GES com 0 colaboradores no PGR)</label>
-        <div style="margin:4px 0 10px"><small>Hoje a regra dá 0 avaliações a GES sem colaborador (ficam fora do preço). Marcado, cada um recebe a quantidade de 1 colaborador. O esboço de medições tem a própria opção, no passo 6.</small></div>
         <h3>Mineração (NR-22)</h3>
         <label style="font-size:14px"><input type="checkbox" id="chk-mineracao"> Empresa de mineração: aplicar o Anexo V da NR-22 nas poeiras minerais</label>
         <div id="mineracao-info" style="margin-top:6px"><small></small></div>
@@ -381,6 +378,7 @@
     <div id="res-ver" class="aviso" style="display:block"></div>
     <div class="botoes no-print">
       <button class="pri" id="btn-reg">Registrar no relatório</button>
+      <label style="display:inline-flex;gap:6px;align-items:center;margin:0 8px 0 0;font-size:13px;color:var(--texto)" title="Hoje a regra dá 0 avaliações a GES com 0 colaboradores (ficam fora do preço). Marcado, cada um recebe a quantidade de 1 colaborador"><input type="checkbox" id="chk-semcolab-prop3"> Incluir GES sem colaborador no LTCAT/LI (<span id="res-nsc">0</span>)</label>
       <button class="pri" id="btn-excel">Baixar Excel (Planilha de Custos SESI)</button>
       <button class="sec" id="btn-print">Imprimir / PDF</button>
       <label style="display:inline-flex;gap:6px;align-items:center;margin:0 8px 0 0;font-size:13px;color:var(--texto)"><input type="checkbox" id="print-email" checked> Imprimir com o texto da proposta (e-mail)</label>
@@ -3724,7 +3722,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     const nCrit = pontosCriticos().length;
     $('#lev-info').innerHTML = `${S.linhas.length} linhas${nVis !== S.linhas.length ? ` (mostrando ${nVis} pelo filtro)` : ''}.${S.gruposExcluidos.length ? ` <span class="tag ver">Fora da precificação: ${S.gruposExcluidos.map(g => ROT_GRUPO[g]).join(', ')}</span>` : ''} ${nVer ? `<button type="button" class="tag ver tag-btn${F.tipo === 'VERIFICAR' ? ' ativo' : ''}" data-flt="VERIFICAR" title="${F.tipo === 'VERIFICAR' ? 'Filtro ativo: clique para mostrar tudo' : 'Clique para mostrar só essas linhas'}">${nVer} marcadas VERIFICAR${F.tipo === 'VERIFICAR' ? ' (filtrando, clique para limpar)' : ''}</button>` : '<span class="tag ok">Nada pendente</span>'} ${nCrit ? `<button type="button" class="tag ver tag-btn${F.tipo === 'CRITICOS' ? ' ativo' : ''}" data-flt="CRITICOS" title="${F.tipo === 'CRITICOS' ? 'Filtro ativo: clique para mostrar tudo' : 'Clique para mostrar só as linhas dos pontos críticos'}">${nCrit} pontos críticos${F.tipo === 'CRITICOS' ? ' (filtrando, clique para limpar)' : ''}</button>` : ''} Linhas cinzas: ${T_().kpiPlano}. Riscadas: não entram.`;
     const gsc = gesSemColab();
-    if (gsc.length) $('#lev-info').innerHTML += ` <button type="button" class="tag ver tag-btn${F.tipo === 'SEMCOLAB' ? ' ativo' : ''}" data-flt="SEMCOLAB" title="${F.tipo === 'SEMCOLAB' ? 'Filtro ativo: clique para mostrar tudo' : 'Clique para mostrar só os GES sem colaborador'}">${gsc.length} GES sem colaborador${F.tipo === 'SEMCOLAB' ? ' (filtrando, clique para limpar)' : ''}</button><div style="margin-top:4px"><small>GES sem colaborador: ${S.semColab.proposta ? '<b>incluídos na proposta</b>' : 'fora da proposta'} e ${S.semColab.esboco ? '<b>incluídos no esboço</b>' : 'fora do esboço'} (regra: 0 avaliações). Para mudar: passo 3 (proposta) e passo 6 (esboço).</small></div>`;
+    if (gsc.length) $('#lev-info').innerHTML += ` <button type="button" class="tag ver tag-btn${F.tipo === 'SEMCOLAB' ? ' ativo' : ''}" data-flt="SEMCOLAB" title="${F.tipo === 'SEMCOLAB' ? 'Filtro ativo: clique para mostrar tudo' : 'Clique para mostrar só os GES sem colaborador'}">${gsc.length} GES sem colaborador${F.tipo === 'SEMCOLAB' ? ' (filtrando, clique para limpar)' : ''}</button><div style="margin-top:4px"><small>GES sem colaborador: ${S.semColab.proposta ? '<b>incluídos na proposta</b>' : 'fora da proposta'} e ${S.semColab.esboco ? '<b>incluídos no esboço</b>' : 'fora do esboço'} (regra: 0 avaliações). Para mudar: na tela do resultado (LTCAT/LI) e na do esboço.</small></div>`;
     $('#btn-crit').textContent = 'Pontos críticos' + (nCrit ? ' (' + nCrit + ')' : '');
     const nOut = S.linhas.filter(l => l.outros && !l.agente && (l.valorManual === null || l.valorManual === undefined) && l.escopo !== 'nao').length;
     if (nOut) {
@@ -4061,7 +4059,6 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
 
   // ------------------------------------------------------------------ passo 3: escopo
   function renderEscopo() {
-    { const c = $('#chk-semcolab-prop2'); if (c) { c.checked = !!S.semColab.proposta; $('#esc-nsc').textContent = gesSemColab().length; } }
     { sincronizarTipoLP(); const tp = tiposDe(S.logistica.tipoLaudo); $$('#log-tipo input').forEach(c => { c.checked = !!tp[c.value]; }); renderLpAviso(); }
     $('#chk-mineracao').checked = !!S.mineracao;
     $('#mineracao-info').innerHTML = S.mineracao ? `Ativo: poeira mineral e sílica com <b>${S.regras.valores.nr22_medicoes_poeira.valor} medições por GES</b> (NR-22 Anexo V, item 4.2). ${/^0[5-9]/.test(String(S.cadastro.cnae || '').replace(/\D/g, '').slice(0, 2)) ? 'Sugerido pelo CNAE ' + S.cadastro.cnae + '.' : ''}` : 'Desligado: poeira e sílica seguem a regra geral (1 amostrador por GES).';
@@ -4075,7 +4072,6 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     else $('#escopo-proposta').textContent = 'Sem proposta lida. O plano escolhido acima define o que já está ' + (S.modulo === 'esboco' ? 'contratado.' : 'coberto.');
   }
   function ligarEscopo() {
-    $('#chk-semcolab-prop2').addEventListener('change', () => { S.semColab.proposta = $('#chk-semcolab-prop2').checked; Ocorrencias.registrar(S, { origem: 'Escopo', acao: (S.semColab.proposta ? 'GES sem colaborador incluídos na proposta' : 'GES sem colaborador retirados da proposta') + ' (' + gesSemColab().length + ' GES)' }); renderEscopo(); });
     $('#chk-mineracao').addEventListener('change', () => { S.mineracao = $('#chk-mineracao').checked; renderEscopo(); });
     $('#sel-plano').addEventListener('change', () => { S.plano = $('#sel-plano').value; renderEscopo(); });
     $('#btn-aplicar-plano').addEventListener('click', () => { S.linhas.forEach(l => delete l.escopoManual); Motor.aplicarPlano(S.linhas, S.regras, S.plano); renderEscopo(); });
@@ -4169,6 +4165,7 @@ table{border-collapse:collapse;width:100%;margin-bottom:6px}th,td{border:1px sol
     S.resultadoTotal = Motor.calcular(ent, 'total');
   }
   function renderResultado() {
+    { const c = $('#chk-semcolab-prop3'); if (c) { c.checked = !!S.semColab.proposta; $('#res-nsc').textContent = gesSemColab().length; c.parentElement.hidden = !gesSemColab().length; } }
     calcular();
     const R = S.resultado, RT = S.resultadoTotal, c = R.custos;
     $('#kpis').innerHTML = `
@@ -4341,6 +4338,7 @@ Responsável: ${S.logistica.responsavel || ''}    Data: ${(S.logistica.data || '
     $('#btn-excel').addEventListener('click', async () => { if (!confirmarPendencias('baixar o Excel')) return; try { baixar(await gerarExcelBlob(), nomeBase() + '.xlsx'); } catch (e) { alert('Erro ao gerar Excel: ' + e.message); } });
     $('#btn-json').addEventListener('click', () => baixar(new Blob([JSON.stringify(estadoJSON(), null, 1)], { type: 'application/json' }), nomeBase() + '.json'));
     $('#btn-print').addEventListener('click', () => { if (confirmarPendencias('imprimir a proposta')) imprimirResultado(); });
+    $('#chk-semcolab-prop3').addEventListener('change', () => { S.semColab.proposta = $('#chk-semcolab-prop3').checked; Ocorrencias.registrar(S, { origem: 'Resultado', acao: (S.semColab.proposta ? 'GES sem colaborador incluídos no LTCAT/LI' : 'GES sem colaborador retirados do LTCAT/LI') + ' (' + gesSemColab().length + ' GES)' }); renderResultado(); });
     $('#print-email').addEventListener('change', () => document.body.classList.toggle('print-sem-email', !$('#print-email').checked));
     $('#texto-proposta').addEventListener('input', () => { $('#texto-proposta-print').textContent = $('#texto-proposta').value; });
     $('#btn-copiar').addEventListener('click', () => { navigator.clipboard.writeText($('#texto-proposta').value); $('#btn-copiar').textContent = 'Copiado'; setTimeout(() => $('#btn-copiar').textContent = 'Copiar texto', 1500); });
